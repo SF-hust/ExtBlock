@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtBlock", "ExtBlock\ExtBlock.csproj", "{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtBlockClient", "ExtBlockClient\ExtBlockClient.csproj", "{CF512015-847F-4157-B640-42DAE843F4FD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885} = {6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtBlockServer", "ExtBlockServer\ExtBlockServer.csproj", "{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885} = {6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF512015-847F-4157-B640-42DAE843F4FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF512015-847F-4157-B640-42DAE843F4FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF512015-847F-4157-B640-42DAE843F4FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF512015-847F-4157-B640-42DAE843F4FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {653EEE84-DDD9-4CB6-A67B-FB22EE711209}
+	EndGlobalSection
+EndGlobal
