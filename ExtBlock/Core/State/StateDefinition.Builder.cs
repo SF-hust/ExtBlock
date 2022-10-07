@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using ExtBlock.Core.Property;
 
 namespace ExtBlock.Core.State
 {
@@ -13,10 +12,10 @@ namespace ExtBlock.Core.State
     {
         public class Builder
         {
-            public delegate S StateFactory(O owner, StatePropertyProvider properties);
+            public delegate S StateFactory(O owner, StateProperties properties);
 
             private readonly O _owner;
-            private readonly List<KeyValuePair<IStateProperty, object>> _properties = new List<KeyValuePair<IStateProperty, object>>();
+            private readonly StatePropertyProvider _properties = new StatePropertyProvider();
             private readonly StateFactory _factory;
 
             protected Builder(O owner, StateFactory factory)
@@ -30,17 +29,17 @@ namespace ExtBlock.Core.State
                 return new Builder(owner, factory);
             }
 
-            public Builder AddProperty(IStateProperty property, object defaultValue)
+            public Builder AddProperty(IStateProperty property, int defaultValueIndex)
             {
-                if (!property.ValueIsValid(defaultValue))
+                if (!property.IndexIsValid(defaultValueIndex))
                 {
-                    throw new Exception($"In state definition for [{_owner}] : value (= {property.ValueToString(defaultValue)}) is illegal for state property ({property})");
+                    throw new Exception($"In state definition for [{_owner}] : valueIndex (= {defaultValueIndex}) out of bound");
                 }
-                if (_properties.Exists((v) => v.Key.Equals(property)))
+                if (_properties.ContainsProperty(property))
                 {
                     throw new Exception($"In state definition for [{_owner}] : state property ({property}) already exists");
                 }
-                _properties.Add(new KeyValuePair<IStateProperty, object>(property, defaultValue));
+                _properties.TryAddIndex(property, defaultValueIndex);
                 return this;
             }
 
@@ -48,16 +47,14 @@ namespace ExtBlock.Core.State
             {
                 int stateCount = 1;
                 int defaultStateIndex = 0;
-                List<int> indexOffsetForProperty = new List<int>(_properties.Count);
+                List<int> indexOffsetForProperty = new List<int>(_properties.PropertyCount);
 
                 // calculate count of states and the index of the default state
                 // calculate index offset in states list for every property
                 foreach (var pair in _properties)
                 {
                     IStateProperty property = pair.Key;
-                    object value = pair.Value;
-
-                    int i = property.GetValueIndex(value);
+                    int i = pair.Value;
                     Debug.Assert(i >= 0 && i < property.CountOfValues);
                     indexOffsetForProperty.Add(stateCount);
                     defaultStateIndex += i * stateCount;
@@ -66,10 +63,10 @@ namespace ExtBlock.Core.State
 
                 // gen all states
                 List<S> states = new List<S>(stateCount);
-                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_properties);
+                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_properties.PropertyDefinition);
                 for(int i = 0; i < stateCount; ++i)
                 {
-                    S state = _factory(_owner, propertyGenerator.Next);
+                    S state = _factory(_owner, propertyGenerator.Next.AsInmmutable);
                     states.Add(state);
                 }
 
@@ -81,7 +78,7 @@ namespace ExtBlock.Core.State
 
                     // gen neighbours
                     Dictionary<IStateProperty, ReadOnlyCollection<S>> neighbour = new Dictionary<IStateProperty, ReadOnlyCollection<S>>();
-                    for(int pi = 0; pi < _properties.Count; ++pi)
+                    for(int pi = 0; pi < _properties.PropertyCount; ++pi)
                     {
                         IStateProperty property = _properties[pi].Key;
                         ReadOnlyCollection<S> neighbourForThisProperty;
@@ -107,7 +104,7 @@ namespace ExtBlock.Core.State
 
                     // gen followers
                     Dictionary<IStateProperty, S> follower = new Dictionary<IStateProperty, S>();
-                    for (int pi = 0; pi < _properties.Count; ++pi)
+                    for (int pi = 0; pi < _properties.PropertyCount; ++pi)
                     {
                         IStateProperty property = _properties[pi].Key;
                         int followStateIndex = (i + indexOffsetForProperty[pi]) % (property.CountOfValues * indexOffsetForProperty[pi]);
@@ -127,10 +124,10 @@ namespace ExtBlock.Core.State
 
             private class StatePropertyGenerator
             {
-                private readonly List<KeyValuePair<IStateProperty, object>> _properties;
+                private readonly List<IStateProperty> _properties;
                 private readonly List<int> valueIndexes;
 
-                public StatePropertyGenerator(List<KeyValuePair<IStateProperty, object>> properties)
+                public StatePropertyGenerator(List<IStateProperty> properties)
                 {
                     _properties = properties;
                     valueIndexes = Enumerable.Repeat(0, properties.Count).ToList();
@@ -141,10 +138,10 @@ namespace ExtBlock.Core.State
                     get
                     {
                         StatePropertyProvider stateProperties = new StatePropertyProvider();
-                        for(int i = 0; i < _properties.Count; ++i)
+                        for(int n = 0; n < _properties.Count; ++n)
                         {
-                            IStateProperty property = _properties[i].Key;
-                            bool success = stateProperties.TryAdd(property, property[valueIndexes[i]]);
+                            IStateProperty property = _properties[n];
+                            bool success = stateProperties.TryAddIndex(property, valueIndexes[n]);
                             Debug.Assert(success);
                         }
                         UpdateIndexList();
@@ -160,7 +157,7 @@ namespace ExtBlock.Core.State
                     {
                         ++valueIndexes[i];
                         carry = false;
-                        if (valueIndexes[i] == _properties[i].Key.CountOfValues)
+                        if (valueIndexes[i] == _properties[i].CountOfValues)
                         {
                             valueIndexes[i] = 0;
                             carry = true;

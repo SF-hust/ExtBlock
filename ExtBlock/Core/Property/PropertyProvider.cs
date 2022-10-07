@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using ExtBlock.Core.State;
 
 namespace ExtBlock.Core.Property
 {
@@ -39,7 +40,7 @@ namespace ExtBlock.Core.Property
             return false;
         }
 
-        public bool Set(IStateProperty property, object value)
+        public bool Set(IProperty property, object value)
         {
             if (property.ValueIsValid(value))
             {

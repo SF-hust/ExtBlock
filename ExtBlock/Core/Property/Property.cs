@@ -19,7 +19,7 @@ namespace ExtBlock.Core.Property
         private readonly string _name;
         public string Name { get => _name; }
 
-        public Type TypeOfValue { get => typeof(T); }
+        public Type ValuesType { get => typeof(T); }
         private readonly int _hashCodeCache;
         public sealed override int GetHashCode()
         {
@@ -87,7 +87,7 @@ namespace ExtBlock.Core.Property
 
         public override string ToString()
         {
-            return Name + " : " + TypeOfValue.ToString();
+            return Name + " : " + ValuesType.ToString();
         }
     }
 }

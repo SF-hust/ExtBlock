@@ -1,4 +1,6 @@
-﻿namespace ExtBlock.Core.Property
+﻿using ExtBlock.Core.State;
+
+namespace ExtBlock.Core.Property
 {
     public interface IStatePropertyProvider
     {

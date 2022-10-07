@@ -1,15 +1,13 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
-using ExtBlock.Core.Property;
-
 namespace ExtBlock.Core.State
 {
     public abstract class StateHolder<O, S> : IStateHolder<O, S>
         where O : class, IStateDefiner<O, S>
         where S : StateHolder<O, S>
     {
-        protected StateHolder(O owner, StatePropertyProvider properties)
+        protected StateHolder(O owner, StateProperties properties)
         {
             _owner = owner;
             _properties = properties;
@@ -27,16 +25,12 @@ namespace ExtBlock.Core.State
         private ReadOnlyDictionary<IStateProperty, ReadOnlyCollection<S>>? _neighbours;
         private ReadOnlyDictionary<IStateProperty, S>? _followers;
 
-        public bool SetProperty(IStateProperty property, object value, [NotNullWhen(true)] out S? state)
+        public bool SetProperty(IStateProperty property, int valueIndex, [NotNullWhen(true)] out S? state)
         {
-            if (_neighbours != null && _neighbours.TryGetValue(property, out var states))
+            if (_neighbours != null && property.IndexIsValid(valueIndex) && _neighbours.TryGetValue(property, out var states))
             {
-                int i = property.GetValueIndex(value);
-                if (i >= 0)
-                {
-                    state = states[i];
-                    return true;
-                }
+                state = states[valueIndex];
+                return true;
             }
             state = null;
             return false;
@@ -51,7 +45,7 @@ namespace ExtBlock.Core.State
             return false;
         }
 
-        private readonly StatePropertyProvider _properties;
-        public StatePropertyProvider Properties => _properties;
+        private readonly StateProperties _properties;
+        public StateProperties Properties => _properties;
     }
 }

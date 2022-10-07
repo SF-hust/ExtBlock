@@ -5,7 +5,7 @@ namespace ExtBlock.Core.Property
     public interface IProperty : IComparable<IProperty>
     {
         public string Name { get; }
-        public Type TypeOfValue { get; }
+        public Type ValuesType { get; }
 
         public abstract bool ParseValue(string str, out object? value);
         public abstract string ValueToString(object value);

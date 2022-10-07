@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 
-namespace ExtBlock.Core.Property
+namespace ExtBlock.Core.State
 {
     public class EnumStateProperty<T> : StateProperty<T>
         where T : struct, Enum
     {
-
         public static EnumStateProperty<T> Create(string name)
         {
             CheckEnumEntries();
@@ -47,21 +47,15 @@ namespace ExtBlock.Core.Property
             return new EnumStateProperty<T>(name, valueList.ToArray());
         }
 
-        protected EnumStateProperty(string name, T[] values) : base(name)
-        {
-            _values = values;
-            BoxedValues = new object[values.Length];
-            for(int i = 0; i < values.Length; ++i)
-            {
-                BoxedValues[i] = values[i];
-            }
-        }
-
         private static void CheckEnumEntries()
         {
+            if (EnumCheckCache.Enums.Contains(typeof(T)))
+            {
+                return;
+            }
             if(Enum.GetUnderlyingType(typeof(T)) != typeof(int))
             {
-                throw new Exception($"Fail to check enum entries : enum \"{typeof(T).FullName}\" must has underlying type of int");
+                throw new Exception($"Check enum entries for EnumStateProperty failed : enum \"{typeof(T).FullName}\" must has underlying type of int");
             }
             HashSet<string> keys = new HashSet<string>();
             foreach (string key in Enum.GetNames(typeof(T)))
@@ -69,49 +63,32 @@ namespace ExtBlock.Core.Property
                 string lower = key.ToLower();
                 if (keys.Contains(key))
                 {
-                    throw new Exception($"Fail to check enum entries : enum \"{typeof(T).FullName}\" contains same ignorcase keys \"{lower}\"");
+                    throw new Exception($"Check enum entries for EnumStateProperty failed : enum \"{typeof(T).FullName}\" contains same ignorcase keys \"{lower}\"");
                 }
                 keys.Add(lower);
+            }
+            EnumCheckCache.Enums.Add(typeof(T));
+        }
+
+        protected EnumStateProperty(string name, T[] values) : base(name, values.Length)
+        {
+            _values = values;
+            _keys = new string[values.Length];
+            for(int i = 0; i < values.Length; ++i)
+            {
+                string? key = Enum.GetName(typeof(T), values[i]);
+                Debug.Assert(key != null);
+                _keys[i] = key;
             }
         }
 
         protected T[] _values;
-        public override int CountOfValues => _values.Length;
-        public override IEnumerable<T> AllValues => _values;
+        public override IEnumerable<T> Values => _values;
+        protected string[] _keys;
 
-        protected object[] BoxedValues;
-
-        public override bool ParseValue(string str, out T value)
-        {
-            if (Enum.TryParse(str, true, out T v))
-            {
-                value = v;
-                return ValueIsValid(v);
-            }
-            value = default;
-            return false;
-        }
-        public override string ValueToString(T value)
-        {
-            string? key = Enum.GetName(typeof(T), value);
-            if(key == null)
-            {
-                return $"[undefined value(= {value})]";
-            }
-            return key.ToLower();
-        }
         public override bool ValueIsValid(T value)
         {
             return _values.Contains(value);
-        }
-
-        public override bool EqualWithValues(StateProperty<T>? other)
-        {
-            if (Equals(other) && other is EnumStateProperty<T> p)
-            {
-                return _values.SequenceEqual(p._values);
-            }
-            return false;
         }
 
         public override int GetValueIndex(T value)
@@ -126,8 +103,6 @@ namespace ExtBlock.Core.Property
             return -1;
         }
 
-        public override object this[int index] => BoxedValues[index];
-
         public override T GetValueByIndex(int index)
         {
             if(index >= 0 && index < CountOfValues)
@@ -137,9 +112,39 @@ namespace ExtBlock.Core.Property
             throw new IndexOutOfRangeException();
         }
 
+        public override bool ParseValue(string str, out T value)
+        {
+            for(int i = 0; i < CountOfValues; ++i)
+            {
+                if(str == _keys[i])
+                {
+                    value = _values[i];
+                    return true;
+                }
+            }
+            value = default;
+            return false;
+        }
+
+        public override string ValueToString(T value)
+        {
+            int index = GetValueIndex(value);
+            return index == -1 ? $"[undefined value(= {value})]" : _keys[index];
+        }
+
+        public override bool ValueEquels(StateProperty<T>? other)
+        {
+            return other is EnumStateProperty<T> p && _values.SequenceEqual(p._values);
+        }
+
         public override string ToString()
         {
-            return base.ToString() + $", values = {from v in _values select Enum.GetName(typeof(T), v)}";
+            return base.ToString() + $", values = {from v in _values select Enum.GetName(typeof(T), v).ToLower()}";
         }
+    }
+
+    class EnumCheckCache
+    {
+        public static ConcurrentBag<Type> Enums = new ConcurrentBag<Type>();
     }
 }
