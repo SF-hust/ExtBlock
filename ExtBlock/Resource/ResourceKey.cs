@@ -5,9 +5,9 @@ namespace ExtBlock.Resource
 {
     public sealed class ResourceKey : IComparable<ResourceKey>
     {
-        public const string DEFAULT_REGISTRY_PATH = "registry";
+        public const string ROOT_REGISTRY_PATH = "registry";
 
-        public static readonly ResourceLocation REGISTRY = ResourceLocation.Create(DEFAULT_REGISTRY_PATH);
+        public static readonly ResourceLocation REGISTRY = ResourceLocation.Create(ROOT_REGISTRY_PATH);
 
         private static readonly Dictionary<string, ResourceKey> RESOURCE_KEYS = new Dictionary<string, ResourceKey>();
 
