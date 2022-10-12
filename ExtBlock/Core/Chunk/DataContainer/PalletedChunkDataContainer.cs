@@ -1,0 +1,17 @@
+﻿using ExtBlock.Utility.Container;
+
+namespace ExtBlock.Core.ChunkDataContainer
+{
+    public class PalletedChunkDataContainer<T> : PalletedContainer<T>, IChunkDataContainer<T> where T : class
+    {
+        public T Get(int x, int y, int z)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Set(int x, int y, int z, T value)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
