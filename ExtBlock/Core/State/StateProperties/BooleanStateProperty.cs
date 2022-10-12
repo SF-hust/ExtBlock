@@ -58,7 +58,7 @@ namespace ExtBlock.Core.State
             return value ? bool.TrueString : bool.FalseString;
         }
 
-        public override bool ValueEquels(StateProperty<bool>? other)
+        public override bool ValueEquals(StateProperty<bool>? other)
         {
             return true;
         }

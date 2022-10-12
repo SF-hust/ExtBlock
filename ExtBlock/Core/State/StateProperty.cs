@@ -1,24 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using ExtBlock.Math;
 
 namespace ExtBlock.Core.State
 {
     public abstract class StateProperty<T> : IStateProperty
     {
+        /// <summary>
+        /// min value count a stateProperty can use
+        /// </summary>
         public const int MIN_VALUE_COUNT = 2;
+        /// <summary>
+        /// max value count a stateProperty can use
+        /// </summary>
         public const int MAX_VALUE_COUNT = 65536;
 
-        protected StateProperty(string name, int count)
+        protected StateProperty(string name, int valueCount)
         {
-            if(count < MIN_VALUE_COUNT || count > MAX_VALUE_COUNT)
+            if(valueCount < MIN_VALUE_COUNT || valueCount > MAX_VALUE_COUNT)
             {
                 throw new Exception($"value count must be in [{MIN_VALUE_COUNT}, {MAX_VALUE_COUNT}]");
             }
             _name = name;
-            _count = count;
-            _bitCount = MathHelper.StorageBitCount(count);
+            _count = valueCount;
+            _bitCount = MathHelper.StorageBitCount(valueCount);
             _bitMask = MathHelper.LownBitOne(_bitCount);
         }
 
@@ -26,6 +33,7 @@ namespace ExtBlock.Core.State
         public string Name => _name;
 
         public Type ValuesType => typeof(T);
+
         public Type UnderlyingType => typeof(int);
 
         private readonly int _count;
@@ -37,7 +45,7 @@ namespace ExtBlock.Core.State
         private readonly int _bitMask;
         public int BitMask => _bitMask;
 
-        public IEnumerable<int> Indices => Enumerable.Range(0, _count - 1);
+        public IEnumerable<int> ValueIndices => Enumerable.Range(0, _count - 1);
 
         public bool IndexIsValid(int index)
         {
@@ -71,7 +79,7 @@ namespace ExtBlock.Core.State
             }
             if(other is StateProperty<T> o)
             {
-                return ValueEquels(o);
+                return ValueEquals(o);
             }
             return false;
         }
@@ -81,13 +89,53 @@ namespace ExtBlock.Core.State
             return _name + " : " + ValuesType.ToString();
         }
 
+        /// <summary>
+        /// typed values this StateProperty can take
+        /// </summary>
         public abstract IEnumerable<T> Values { get; }
+
+        /// <summary>
+        /// weather a value this StateProperty can take
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract bool ValueIsValid(T value);
+
+        /// <summary>
+        /// get typed value with index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public abstract T GetValueByIndex(int index);
+
+        /// <summary>
+        /// get index of a value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>-1 if value can't be taken by this property</returns>
         public abstract int GetValueIndex(T value);
+
+        /// <summary>
+        /// parse value from a string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract bool ParseValue(string str, out T value);
+
+        /// <summary>
+        /// get a string representing the value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract string ValueToString(T value);
-        public abstract bool ValueEquels(StateProperty<T>? other);
+
+        /// <summary>
+        /// whether this property's values equals with another
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public abstract bool ValueEquals(StateProperty<T>? other);
 
     }
 }

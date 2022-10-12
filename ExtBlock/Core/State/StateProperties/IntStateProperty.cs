@@ -58,7 +58,7 @@ namespace ExtBlock.Core.State
             return value.ToString();
         }
 
-        public override bool ValueEquels(StateProperty<int>? other)
+        public override bool ValueEquals(StateProperty<int>? other)
         {
             return other is IntStateProperty ip && _from == ip._from && _to == ip._to;
         }

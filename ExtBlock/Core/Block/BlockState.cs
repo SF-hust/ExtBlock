@@ -8,12 +8,12 @@ namespace ExtBlock.Core
 
         public static readonly StateDefinition<Block, BlockState>.Builder.StateFactory Factory = Create;
 
-        protected static BlockState Create(Block block, StatePropertyProvider properties)
+        protected static BlockState Create(Block block, StateProperties properties)
         {
             return new BlockState(block, properties);
         }
 
-        protected BlockState(Block block, StatePropertyProvider properties)
+        protected BlockState(Block block, StateProperties properties)
             : base(block, properties)
         {
         }

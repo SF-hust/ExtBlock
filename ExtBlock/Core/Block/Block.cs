@@ -16,8 +16,8 @@ namespace ExtBlock.Core
         RegistryInfo IRegistryEntry.UntypedRegInfo => _regInfo!;
 
         // property
-        private BlockPropertyProvider _properties = new BlockPropertyProvider();
-        public BlockPropertyProvider Properties => _properties;
+        private BlockProperties _properties = new BlockProperties();
+        public BlockProperties Properties => _properties;
 
         // state
         private StateDefinition<Block, BlockState>? _stateDefinition = null;

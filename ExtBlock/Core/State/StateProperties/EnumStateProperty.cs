@@ -132,7 +132,7 @@ namespace ExtBlock.Core.State
             return index == -1 ? $"[undefined value(= {value})]" : _keys[index];
         }
 
-        public override bool ValueEquels(StateProperty<T>? other)
+        public override bool ValueEquals(StateProperty<T>? other)
         {
             return other is EnumStateProperty<T> p && _values.SequenceEqual(p._values);
         }

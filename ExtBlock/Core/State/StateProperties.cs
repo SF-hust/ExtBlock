@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ExtBlock.Core.State
+﻿namespace ExtBlock.Core.State
 {
     public class StateProperties
     {
