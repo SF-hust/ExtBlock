@@ -1,4 +1,5 @@
-﻿using ExtBlock.Resource;
+﻿using ExtBlock.Game;
+using ExtBlock.Resource;
 
 namespace ExtBlock.Core.Registry
 {
@@ -17,10 +18,10 @@ namespace ExtBlock.Core.Registry
             ResourceKey rootRegistryKey = ResourceKey.Create(ResourceKey.REGISTRY, ResourceKey.REGISTRY);
             RegistryInfo<Registry> rootRegistryInfo = new RegistryInfo<Registry>(-1, rootRegistryKey, RootRegistry, RootRegistry);
             IRegistryEntry<Registry> rootRegistry = RootRegistry;
-            rootRegistry.SetRegistryInfo(rootRegistryInfo);
+            rootRegistry.RegInfo = rootRegistryInfo;
 
             // register other extblock registries
-            //Add("block", BlockRegistry);
+            Add("block", BlockRegistry);
         }
 
         /// <summary>
@@ -48,6 +49,6 @@ namespace ExtBlock.Core.Registry
          * extblock Registries
          */
 
-        //public static Registry<Block> BlockRegistry = new Registry<Block>();
+        public static Registry<Block> BlockRegistry = new Registry<Block>();
     }
 }
