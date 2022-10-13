@@ -13,6 +13,6 @@
         where O : class, IStateDefiner<O, S>
         where S : StateHolder<O, S>
     {
-        public StateDefinition<O, S> StateDef { get; }
+        public StateDefinition<O, S> StateDef { get; set; }
     }
 }

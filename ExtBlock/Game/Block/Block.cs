@@ -4,23 +4,21 @@ using ExtBlock.Core.Registry;
 
 namespace ExtBlock.Core
 {
-    using BlockStateDefBuilder = StateDefinition<Block, BlockState>.Builder;
-
     public class Block : IRegistryEntry<Block>,
         IBlockPropertyProvider,
         IStateDefiner<Block, BlockState>
     {
-        // registry
+        // registry entry
         private RegistryInfo<Block>? _regInfo;
-        RegistryInfo<Block> IRegistryEntry<Block>.RegInfo { get => _regInfo!; set => _regInfo = value; }
-        RegistryInfo IRegistryEntry.UntypedRegInfo => _regInfo!;
+        public RegistryInfo<Block> RegInfo { get => _regInfo!; set => _regInfo ??= value; }
+        public RegistryInfo UntypedRegInfo => _regInfo!;
 
         // property
-        private BlockProperties _properties = new BlockProperties();
-        public BlockProperties Properties => _properties;
+        private BlockProperty _properties;
+        public BlockProperty Properties => _properties;
 
-        // state
-        private StateDefinition<Block, BlockState>? _stateDefinition = null;
+        // state definition
+        private StateDefinition<Block, BlockState>? _stateDefinition;
         public StateDefinition<Block, BlockState> StateDef
         {
             get
@@ -28,17 +26,13 @@ namespace ExtBlock.Core
                 Debug.Assert(_stateDefinition != null);
                 return _stateDefinition;
             }
+            set => _stateDefinition ??= value;
         }
 
 
-        public Block()
+        public Block(BlockProperty properties)
         {
-            BlockStateDefBuilder stateBuilder = BlockStateDefBuilder.Create(this, BlockState.Factory);
-            CreateStateDefinition(stateBuilder);
-        }
-
-        protected virtual void CreateStateDefinition(BlockStateDefBuilder stateDefBuilder)
-        {
+            _properties = properties;
         }
     }
 }

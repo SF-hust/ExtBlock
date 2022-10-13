@@ -168,7 +168,7 @@ namespace ExtBlock.Core.Registry
             _entries.Add(entry);
             ResourceLocation registryLocation = ((IRegistryEntry<Registry>)this).RegInfo.Location;
             RegistryInfo<ET> info = new RegistryInfo<ET>(id, ResourceKey.Create(registryLocation, location), this, entry);
-            entry.SetRegistryInfo(info);
+            entry.RegInfo = info;
             return true;
         }
 

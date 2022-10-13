@@ -21,9 +21,9 @@ namespace ExtBlock.Core.Registry
     /// you need to implementing this interface,
     /// and add following code into your class :
     /// <code>
-    /// private RegistryInfo<Registry>? _regInfo;
-    /// RegistryInfo<Registry> IRegistryEntry<Registry>.RegInfo { get => _regInfo!; set => _regInfo = value; }
-    /// RegistryInfo IRegistryEntry.UntypedRegInfo => _regInfo!;
+    /// private RegistryInfo<Block>? _regInfo;
+    /// public RegistryInfo<Block> RegInfo { get => _regInfo!; set => _regInfo ??= value; }
+    /// public RegistryInfo UntypedRegInfo => _regInfo!;
     /// </code>
     /// </example>
     /// <typeparam name="ET">the class implementing this interface</typeparam>
@@ -33,21 +33,6 @@ namespace ExtBlock.Core.Registry
         /// <summary>
         /// typed registry entry infomation
         /// </summary>
-        public RegistryInfo<ET> RegInfo { get; protected set; }
-
-        /// <summary>
-        /// set registry entry infomation, this is only called by registry instance
-        /// </summary>
-        /// <param name="info">generated registry infomation by registry</param>
-        /// <exception cref="InvalidOperationException">when <c>RegInfo</c> is not null</exception>
-        public void SetRegistryInfo(RegistryInfo<ET> info)
-        {
-            if(RegInfo == null)
-            {
-                RegInfo = info;
-                return;
-            }
-            throw new InvalidOperationException($"Can't set RegInfo for {{{RegInfo}}} twice");
-        }
+        public RegistryInfo<ET> RegInfo { get; set; }
     }
 }

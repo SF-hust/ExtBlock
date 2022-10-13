@@ -10,6 +10,6 @@ namespace ExtBlock.Core
 {
     public interface IBlockPropertyProvider
     {
-        public BlockProperties Properties { get; }
+        public BlockProperty Properties { get; }
     }
 }

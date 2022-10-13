@@ -31,8 +31,8 @@ namespace ExtBlock.Core.Registry
         }
 
         private readonly string _modid;
-        private Registry<ET> _registry;
-        private Dictionary<ResourceLocation, ET> _entries = new Dictionary<ResourceLocation, ET>();
+        private readonly Registry<ET> _registry;
+        private readonly Dictionary<ResourceLocation, ET> _entries = new Dictionary<ResourceLocation, ET>();
 
         private DeferredRegister(string modid, Registry<ET> registry)
         {
