@@ -1,4 +1,5 @@
 ﻿using ExtBlock.Core.State;
+using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Core
 {
@@ -8,12 +9,12 @@ namespace ExtBlock.Core
 
         public static readonly StateDefinition<Block, BlockState>.Builder.StateFactory Factory = Create;
 
-        protected static BlockState Create(Block block, StateProperties properties)
+        protected static BlockState Create(Block block, StatePropertyList? properties)
         {
             return new BlockState(block, properties);
         }
 
-        protected BlockState(Block block, StateProperties properties)
+        protected BlockState(Block block, StatePropertyList? properties)
             : base(block, properties)
         {
         }

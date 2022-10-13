@@ -1,4 +1,4 @@
-﻿namespace ExtBlock.Core
+﻿namespace ExtBlock.Game
 {
     public class World : IWorld
     {
