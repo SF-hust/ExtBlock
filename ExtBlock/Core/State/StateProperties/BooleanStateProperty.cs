@@ -10,12 +10,12 @@ namespace ExtBlock.Core.State
             return new BooleanStateProperty(name);
         }
         
-        public static readonly IEnumerable<bool> BOOLEAN_PROPERTY_VALUES = new bool[2] { false, true };
+        public static readonly IEnumerable<bool> BOOLEAN_STATE_PROPERTY_VALUES = new bool[2] { false, true };
 
         private BooleanStateProperty(string name) : base(name, 2) { }
 
 
-        public override IEnumerable<bool> Values => BOOLEAN_PROPERTY_VALUES;
+        public override IEnumerable<bool> Values => BOOLEAN_STATE_PROPERTY_VALUES;
 
         public override bool ValueIsValid(bool value)
         {

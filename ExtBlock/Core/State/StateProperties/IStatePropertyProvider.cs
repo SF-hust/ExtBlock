@@ -1,9 +1,9 @@
 ﻿using ExtBlock.Core.State;
 
-namespace ExtBlock.Core.Property
+namespace ExtBlock.Core.State
 {
     public interface IStatePropertyProvider
     {
-        public StatePropertyProvider Properties { get; }
+        public MutableStatePropertyList Properties { get; }
     }
 }

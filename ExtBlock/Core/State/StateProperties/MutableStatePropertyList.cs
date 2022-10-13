@@ -4,19 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 using ExtBlock.Core.Property;
+using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Core.State
 {
-    public class StatePropertyProvider : IStatePropertyProvider, IEnumerable<KeyValuePair<IStateProperty, int>>
+    public class MutableStatePropertyList : IEnumerable<KeyValuePair<IStateProperty, int>>
     {
         public const int MaxPackedBitCount = 16;
 
         public int this[IStateProperty property]
         {
-            get => GetIndex(property);
+            get => Get(property);
             set
             {
-                if(!TrySetIndex(property, value))
+                if(!TrySet(property, value))
                 {
                     throw new IndexOutOfRangeException();
                 }
@@ -37,22 +38,27 @@ namespace ExtBlock.Core.State
 
         public List<IStateProperty> PropertyDefinition => new List<IStateProperty>(from pair in _properties select pair.Key);
 
-        public StateProperties AsInmmutable => new StateProperties(this);
-
-        public StatePropertyProvider Properties => this;
+        /// <summary>
+        /// get immutable warp of this list
+        /// </summary>
+        public StatePropertyList AsImmutable => new StatePropertyList(this);
 
         protected List<KeyValuePair<IStateProperty, int>> _properties = new List<KeyValuePair<IStateProperty, int>>();
 
         public int PropertyCount => _properties.Count;
 
 
-        public StatePropertyProvider()
+        public MutableStatePropertyList()
         {
         }
 
         public int PackedProperties => CalculatePackedProperties();
         public int PackedBitCount => CalculatePackedBitCount();
 
+        /// <summary>
+        /// set property value indices from packed indices
+        /// </summary>
+        /// <param name="packed"></param>
         public void Decode(int packed)
         {
             for(int i = 0; i < _properties.Count; i++)
@@ -99,13 +105,13 @@ namespace ExtBlock.Core.State
             return FindProperty(property) != -1;
         }
 
-        public int GetIndex(IStateProperty property)
+        public int Get(IStateProperty property)
         {
             int i = FindProperty(property);
             return _properties[i].Value;
         }
 
-        public bool TrySetIndex(IStateProperty property, int index)
+        public bool TrySet(IStateProperty property, int index)
         {
             if(!property.IndexIsValid(index))
             {
@@ -123,9 +129,30 @@ namespace ExtBlock.Core.State
             return true;
         }
 
+        public bool TryUpdate(IStateProperty property, int index)
+        {
+            int i = FindProperty(property);
+            if (i != -1 && property.IndexIsValid(index))
+            {
+                _properties[i] = new KeyValuePair<IStateProperty, int>(property, index);
+                return true;
+            }
+            return false;
+        }
+
+        public bool TryAdd(IStateProperty property, int index)
+        {
+            if(FindProperty(property) == -1 && property.IndexIsValid(index))
+            {
+                _properties.Add(new KeyValuePair<IStateProperty, int>(property, index));
+                return true;
+            }
+            return false;
+        }
+
         public bool TryGetValue<VT>(StateProperty<VT> property, out VT value)
         {
-            int index = GetIndex(property);
+            int index = Get(property);
             if(index != -1)
             {
                 value = property.GetValueByIndex(index);
@@ -138,40 +165,19 @@ namespace ExtBlock.Core.State
         public bool TrySetValue<VT>(StateProperty<VT> property, VT value)
         {
             int index = property.GetValueIndex(value);
-            return TrySetIndex(property, index);
-        }
-
-        public bool TryUpdateIndex(IStateProperty property, int index)
-        {
-            int i = FindProperty(property);
-            if (i != -1 && property.IndexIsValid(index))
-            {
-                _properties[i] = new KeyValuePair<IStateProperty, int>(property, index);
-                return true;
-            }
-            return false;
+            return TrySet(property, index);
         }
 
         public bool TryUpdateValue<VT>(StateProperty<VT> property, VT value)
         {
             int index = property.GetValueIndex(value);
-            return TryUpdateIndex(property, index);
-        }
-
-        public bool TryAddIndex(IStateProperty property, int index)
-        {
-            if(FindProperty(property) == -1 && property.IndexIsValid(index))
-            {
-                _properties.Add(new KeyValuePair<IStateProperty, int>(property, index));
-                return true;
-            }
-            return false;
+            return TryUpdate(property, index);
         }
 
         public bool TryAddValue<VT>(StateProperty<VT> property, VT value)
         {
             int index = property.GetValueIndex(value);
-            return TryAddIndex(property, index);
+            return TryAdd(property, index);
         }
     }
 }

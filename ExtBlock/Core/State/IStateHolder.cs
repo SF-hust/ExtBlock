@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using ExtBlock.Core.Property;
+using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Core.State
 {
@@ -13,7 +14,7 @@ namespace ExtBlock.Core.State
     {
         public O Owner { get; }
 
-        public StateProperties Properties { get; }
+        public StatePropertyList? PropertyList { get; }
 
         public bool SetProperty(IStateProperty property, int valueIndex, [NotNullWhen(true)] out S? state);
         public bool CycleProperty(IStateProperty property, [NotNullWhen(true)] out S? state);

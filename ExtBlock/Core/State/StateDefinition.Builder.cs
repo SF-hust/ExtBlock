@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Core.State
 {
@@ -10,12 +11,15 @@ namespace ExtBlock.Core.State
         where O : class, IStateDefiner<O, S>
         where S : StateHolder<O, S>
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public class Builder
         {
-            public delegate S StateFactory(O owner, StateProperties properties);
+            public delegate S StateFactory(O owner, StatePropertyList? properties);
 
             private readonly O _owner;
-            private readonly StatePropertyProvider _properties = new StatePropertyProvider();
+            private readonly MutableStatePropertyList _propertyList = new MutableStatePropertyList();
             private readonly StateFactory _factory;
 
             protected Builder(O owner, StateFactory factory)
@@ -24,34 +28,76 @@ namespace ExtBlock.Core.State
                 _factory = factory;
             }
 
+            /// <summary>
+            /// create a StateDefinition.Builder instance for owner
+            /// </summary>
+            /// <param name="owner">states' owner</param>
+            /// <param name="factory">a delegate to create state with a owner and StateProperty-value list</param>
+            /// <returns></returns>
             public static Builder Create(O owner, StateFactory factory)
             {
                 return new Builder(owner, factory);
             }
 
-            public Builder AddProperty(IStateProperty property, int defaultValueIndex)
+            /// <summary>
+            /// add a StateProperty and the default value's index, this method is more efficient and generic
+            /// </summary>
+            /// <param name="property"></param>
+            /// <param name="defaultValueIndex"></param>
+            /// <returns></returns>
+            /// <exception cref="Exception"></exception>
+            public Builder AddPropertyAndIndex(IStateProperty property, int defaultValueIndex)
             {
                 if (!property.IndexIsValid(defaultValueIndex))
                 {
-                    throw new Exception($"In state definition for [{_owner}] : valueIndex (= {defaultValueIndex}) out of bound");
+                    throw new Exception($"In state definition for [{_owner}] :" +
+                        $" valueIndex (= {defaultValueIndex}) out of bound for property {property}");
                 }
-                if (_properties.ContainsProperty(property))
+                if (!_propertyList.TryAdd(property, defaultValueIndex))
                 {
-                    throw new Exception($"In state definition for [{_owner}] : state property ({property}) already exists");
+                    throw new Exception($"In state definition for [{_owner}] :" +
+                        $" state property ({property}) already exists");
                 }
-                _properties.TryAddIndex(property, defaultValueIndex);
                 return this;
             }
 
+            /// <summary>
+            /// add a StateProperty and the default value, this method is more visual
+            /// </summary>
+            /// <typeparam name="VT"></typeparam>
+            /// <param name="property"></param>
+            /// <param name="defaultValue"></param>
+            /// <returns></returns>
+            /// <exception cref="Exception"></exception>
+            public Builder AddPropertyAndValue<VT> (StateProperty<VT> property, VT defaultValue)
+            {
+                int index = property.GetValueIndex(defaultValue);
+                if (index == -1)
+                {
+                    throw new Exception($"In state definition for [{_owner}] :" +
+                        $" value (= {property.ValueToString(defaultValue)}) can't be taken by property ({property})");
+                }
+                if(!_propertyList.TryAdd(property, index))
+                {
+                    throw new Exception($"In state definition for [{_owner}] :" +
+                        $" state property ({property}) already exists");
+                }
+                return this;
+            }
+
+            /// <summary>
+            /// build all possible states from added StateProperties, if no property is added before, just one state will be created
+            /// </summary>
+            /// <returns></returns>
             public virtual StateDefinition<O, S> Build()
             {
                 int stateCount = 1;
                 int defaultStateIndex = 0;
-                List<int> indexOffsetForProperty = new List<int>(_properties.PropertyCount);
+                List<int> indexOffsetForProperty = new List<int>(_propertyList.PropertyCount);
 
                 // calculate count of states and the index of the default state
                 // calculate index offset in states list for every property
-                foreach (var pair in _properties)
+                foreach (var pair in _propertyList)
                 {
                     IStateProperty property = pair.Key;
                     int i = pair.Value;
@@ -61,12 +107,22 @@ namespace ExtBlock.Core.State
                     stateCount *= property.CountOfValues;
                 }
 
+                List<S> states;
+                // if this owner has no StateProperty defined
+                if (stateCount < 1)
+                {
+                    states = new List<S>(1);
+                    S state = _factory(_owner, null);
+                    states.Add(state);
+                    return new StateDefinition<O, S>(_owner, states.AsReadOnly(), state);
+                }
+
                 // gen all states
-                List<S> states = new List<S>(stateCount);
-                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_properties.PropertyDefinition);
+                states = new List<S>(stateCount);
+                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_propertyList.PropertyDefinition);
                 for(int i = 0; i < stateCount; ++i)
                 {
-                    S state = _factory(_owner, propertyGenerator.Next.AsInmmutable);
+                    S state = _factory(_owner, propertyGenerator.Next.AsImmutable);
                     states.Add(state);
                 }
 
@@ -78,9 +134,9 @@ namespace ExtBlock.Core.State
 
                     // gen neighbours
                     Dictionary<IStateProperty, ReadOnlyCollection<S>> neighbour = new Dictionary<IStateProperty, ReadOnlyCollection<S>>();
-                    for(int pi = 0; pi < _properties.PropertyCount; ++pi)
+                    for(int pi = 0; pi < _propertyList.PropertyCount; ++pi)
                     {
-                        IStateProperty property = _properties[pi].Key;
+                        IStateProperty property = _propertyList[pi].Key;
                         ReadOnlyCollection<S> neighbourForThisProperty;
 
                         // optimise: if neighbour list for current property exists, don't create again
@@ -104,9 +160,9 @@ namespace ExtBlock.Core.State
 
                     // gen followers
                     Dictionary<IStateProperty, S> follower = new Dictionary<IStateProperty, S>();
-                    for (int pi = 0; pi < _properties.PropertyCount; ++pi)
+                    for (int pi = 0; pi < _propertyList.PropertyCount; ++pi)
                     {
-                        IStateProperty property = _properties[pi].Key;
+                        IStateProperty property = _propertyList[pi].Key;
                         int followStateIndex = (i + indexOffsetForProperty[pi]) % (property.CountOfValues * indexOffsetForProperty[pi]);
                         follower.Add(property, states[followStateIndex]);
                     }
@@ -133,15 +189,15 @@ namespace ExtBlock.Core.State
                     valueIndexes = Enumerable.Repeat(0, properties.Count).ToList();
                 }
 
-                public StatePropertyProvider Next
+                public MutableStatePropertyList Next
                 {
                     get
                     {
-                        StatePropertyProvider stateProperties = new StatePropertyProvider();
+                        MutableStatePropertyList stateProperties = new MutableStatePropertyList();
                         for(int n = 0; n < _properties.Count; ++n)
                         {
                             IStateProperty property = _properties[n];
-                            bool success = stateProperties.TryAddIndex(property, valueIndexes[n]);
+                            bool success = stateProperties.TryAdd(property, valueIndexes[n]);
                             Debug.Assert(success);
                         }
                         UpdateIndexList();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using ExtBlock.Core.State.StateProperties;
 using ExtBlock.Math;
 
 namespace ExtBlock.Core.State
@@ -12,6 +12,7 @@ namespace ExtBlock.Core.State
         /// min value count a stateProperty can use
         /// </summary>
         public const int MIN_VALUE_COUNT = 2;
+
         /// <summary>
         /// max value count a stateProperty can use
         /// </summary>
@@ -34,7 +35,7 @@ namespace ExtBlock.Core.State
 
         public Type ValuesType => typeof(T);
 
-        public Type UnderlyingType => typeof(int);
+        public Type IndexType => typeof(int);
 
         private readonly int _count;
         public int CountOfValues => _count;

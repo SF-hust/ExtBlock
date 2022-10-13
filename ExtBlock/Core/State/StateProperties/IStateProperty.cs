@@ -22,7 +22,7 @@ namespace ExtBlock.Core.State
         /// <summary>
         /// type of property's value index
         /// </summary>
-        public Type UnderlyingType { get; }
+        public Type IndexType { get; }
 
         /// <summary>
         /// count of values this property can be
