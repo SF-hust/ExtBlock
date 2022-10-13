@@ -11,6 +11,18 @@ namespace ExtBlock.Core.Property
         {
         }
 
+        public PropertyTable(PropertyTable table, bool copy = true)
+        {
+            if(copy)
+            {
+                _properties = new Dictionary<IProperty, object>(table._properties);
+            }
+            else
+            {
+                _properties = table._properties;
+            }
+        }
+
         public bool Contains(IProperty property)
         {
             return _properties.ContainsKey(property);
