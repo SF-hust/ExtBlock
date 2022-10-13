@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using ExtBlock.Core.Property;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public interface IBlockPropertyProvider
     {

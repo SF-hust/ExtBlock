@@ -2,7 +2,7 @@
 using ExtBlock.Core.State;
 using ExtBlock.Core.Registry;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public class Block : IRegistryEntry<Block>,
         IBlockPropertyProvider,
@@ -13,22 +13,17 @@ namespace ExtBlock.Core
         public RegistryInfo<Block> RegInfo { get => _regInfo!; set => _regInfo ??= value; }
         public RegistryInfo UntypedRegInfo => _regInfo!;
 
-        // property
-        private BlockProperty _properties;
-        public BlockProperty Properties => _properties;
-
         // state definition
         private StateDefinition<Block, BlockState>? _stateDefinition;
         public StateDefinition<Block, BlockState> StateDef
         {
-            get
-            {
-                Debug.Assert(_stateDefinition != null);
-                return _stateDefinition;
-            }
+            get => _stateDefinition!;
             set => _stateDefinition ??= value;
         }
 
+        // property
+        private BlockProperty _properties;
+        public BlockProperty Properties => _properties;
 
         public Block(BlockProperty properties)
         {

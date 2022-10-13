@@ -1,6 +1,6 @@
 ﻿using ExtBlock.Core.Property;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public class BlockProperty : PropertyTable
     {

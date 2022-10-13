@@ -1,7 +1,7 @@
 ﻿using ExtBlock.Core.State;
 using ExtBlock.Core.State.StateProperties;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public class BlockState : StateHolder<Block, BlockState>
     {

@@ -2,7 +2,7 @@
 
 using ExtBlock.Math;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public interface IBlockGetter
     {

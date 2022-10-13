@@ -1,7 +1,7 @@
 ﻿using ExtBlock.Core.State;
 using ExtBlock.Enums;
 
-namespace ExtBlock.Core
+namespace ExtBlock.Game
 {
     public static class BlockStateProperties
     {
@@ -31,6 +31,6 @@ namespace ExtBlock.Core
 
         public static readonly BooleanStateProperty LIGHT = BooleanStateProperty.Create("light");
 
-        public static readonly EnumStateProperty<SlabPart> SLAB_PART = EnumStateProperty<SlabPart>.Create("slab_part");
+        public static readonly EnumStateProperty<SlabPart> SLAB = EnumStateProperty<SlabPart>.Create("slab");
     }
 }
