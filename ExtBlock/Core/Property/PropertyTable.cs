@@ -4,12 +4,10 @@ using ExtBlock.Core.State;
 
 namespace ExtBlock.Core.Property
 {
-    public class PropertyProvider : IPropertyProvider
+    public class PropertyTable
     {
         protected Dictionary<IProperty, object> _properties = new Dictionary<IProperty, object>();
-        public PropertyProvider Properties => this;
-
-        public PropertyProvider()
+        public PropertyTable()
         {
         }
 

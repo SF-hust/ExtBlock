@@ -2,6 +2,6 @@
 {
     public interface IPropertyProvider
     {
-        public PropertyProvider Properties { get; }
+        public PropertyTable Properties { get; }
     }
 }
