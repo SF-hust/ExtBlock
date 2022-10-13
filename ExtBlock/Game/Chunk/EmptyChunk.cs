@@ -1,10 +1,19 @@
-namespace ExtBlock.Core
-{
-    public class EmptyChunk : AbsChunk
-    {
-        private BlockState _state;
+using ExtBlock.Math;
 
-        public EmptyChunk(int x, int y, int z, IWorld world, BlockState state) : base(x, y, z, world)
+namespace ExtBlock.Game
+{
+    public class EmptyChunk : Chunk
+    {
+        private readonly BlockState _state;
+
+        public override bool Writable => false;
+
+        public EmptyChunk(IWorld world, BlockState state, int x, int y, int z) : base(world, x, y, z)
+        {
+            _state = state;
+        }
+
+        public EmptyChunk(IWorld world, BlockState state, ChunkPos pos) : base(world, pos)
         {
             _state = state;
         }

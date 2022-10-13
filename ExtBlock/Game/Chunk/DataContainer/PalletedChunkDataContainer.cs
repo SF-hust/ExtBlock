@@ -1,6 +1,8 @@
-﻿using ExtBlock.Utility.Container;
+﻿using System;
 
-namespace ExtBlock.Core.ChunkDataContainer
+using ExtBlock.Utility.Container;
+
+namespace ExtBlock.Game.ChunkDataContainer
 {
     public class PalletedChunkDataContainer<T> : PalletedContainer<T>, IChunkDataContainer<T> where T : class
     {

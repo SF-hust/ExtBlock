@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExtBlock.Math
+﻿namespace ExtBlock.Math
 {
     public static class MathHelper
     {

@@ -1,12 +1,23 @@
-﻿namespace ExtBlock.Game
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+using ExtBlock.Math;
+
+namespace ExtBlock.Game
 {
     public class World : IWorld
     {
         protected IChunkSource _chunks = new HashChunkSource();
 
-        public bool GetBlockStateAt(int x, int y, int z, [NotNullWhen(true)] out BlockState? state)
+        public bool HasBlockAt(int x, int y, int z)
         {
-            BlockPos chunkPos = GetPosAt(x, y, z, out BlockPos inChunkPos);
+            ChunkPos chunkPos = GetChunkPosAt(x, y, z);
+            return _chunks.Exist(chunkPos);
+        }
+
+        public bool TryGetBlockState(int x, int y, int z, out BlockState? state)
+        {
+            ChunkPos chunkPos = GetPosAt(x, y, z, out BlockPos inChunkPos);
             if (_chunks.Get(chunkPos, out IChunk? chunk))
             {
                 state = chunk.GetBlockState(inChunkPos);
@@ -15,14 +26,15 @@
             state = null;
             return false;
         }
-        public bool GetBlockStateAt(BlockPos pos, [NotNullWhen(true)] out BlockState? state)
+
+        public IEnumerable<BlockState> GetBlockStateRange(int x1, int y1, int z1, int x2, int y2, int z2)
         {
-            return GetBlockStateAt(pos.X, pos.Y, pos.Z, out state);
+            throw new System.NotImplementedException();
         }
 
         public bool SetBlockStateAt(int x, int y, int z, BlockState state)
         {
-            BlockPos chunkPos = GetPosAt(x, y, z, out BlockPos inChunkPos);
+            ChunkPos chunkPos = GetPosAt(x, y, z, out BlockPos inChunkPos);
             if (_chunks.Get(chunkPos, out IChunk? chunk))
             {
                 chunk.SetBlockState(inChunkPos, state);
@@ -30,19 +42,25 @@
             }
             return false;
         }
-        public bool SetBlockStateAt(BlockPos pos, BlockState state)
+
+        public static ChunkPos GetChunkPosAt(int x, int y, int z)
         {
-            return SetBlockStateAt(pos.X, pos.Y, pos.Z, state);
+            return new ChunkPos(x >> 4, y >> 4, z >> 4);
+        }
+        public static ChunkPos GetChunkPosAt(BlockPos pos)
+        {
+            return GetChunkPosAt(pos.x, pos.y, pos.z);
         }
 
-        public static BlockPos GetPosAt(int x, int y, int z, out BlockPos inChunkPos)
+        public static ChunkPos GetPosAt(int x, int y, int z, out BlockPos inChunkPos)
         {
             inChunkPos = new BlockPos(x & 0xF, y & 0xF, z & 0xF);
-            return new BlockPos(x >> 4, y >> 4, z >> 4);
+            return new ChunkPos(x >> 4, y >> 4, z >> 4);
         }
-        public static BlockPos GetPosAt(BlockPos pos, out BlockPos inChunkPos)
+        public static ChunkPos GetPosAt(BlockPos pos, out BlockPos inChunkPos)
         {
-            return GetPosAt(pos.X, pos.Y, pos.Z, out inChunkPos);
+            return GetPosAt(pos.x, pos.y, pos.z, out inChunkPos);
         }
+
     }
 }

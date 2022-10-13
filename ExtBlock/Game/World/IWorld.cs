@@ -1,11 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+
+using ExtBlock.Math;
+
 namespace ExtBlock.Game
 {
-    public interface IWorld
+    public interface IWorld : IBlockGetter
     {
-        public bool GetBlockStateAt(int x, int y, int z, [NotNullWhen(true)] out BlockState? state);
-        public bool GetBlockStateAt(BlockPos pos, [NotNullWhen(true)] out BlockState? state);
-
         public bool SetBlockStateAt(int x, int y, int z, BlockState state);
-        public bool SetBlockStateAt(BlockPos pos, BlockState state);
+        public bool SetBlockStateAt(BlockPos pos, BlockState state)
+        {
+            return SetBlockStateAt(pos.x, pos.y, pos.z, state);
+        }
     }
 }
