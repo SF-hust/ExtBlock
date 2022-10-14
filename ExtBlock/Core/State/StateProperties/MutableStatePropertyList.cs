@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using ExtBlock.Core.Property;
-using ExtBlock.Core.State.StateProperties;
-
 namespace ExtBlock.Core.State
 {
     public class MutableStatePropertyList : IEnumerable<KeyValuePair<IStateProperty, int>>

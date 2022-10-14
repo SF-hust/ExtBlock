@@ -1,5 +1,4 @@
 ﻿using ExtBlock.Core.State;
-using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Game
 {

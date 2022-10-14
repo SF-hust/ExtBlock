@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using ExtBlock.Core.Property;
-using ExtBlock.Core.State.StateProperties;
 
 namespace ExtBlock.Core.State
 {

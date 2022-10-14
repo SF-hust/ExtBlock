@@ -8,11 +8,11 @@ namespace ExtBlock.Core.Registry
         /// <summary>
         /// registry of registries(except itself), it has id of -1 and ResourceKey of "extblock:registry/extblock:registry"
         /// </summary>
-        public static Registry<Registry> RootRegistry = new Registry<Registry>();
+        public static readonly Registry<Registry> RootRegistry = new Registry<Registry>();
 
         private static readonly DeferredRegister<Registry> deferredRegister = DeferredRegister<Registry>.Create(ResourceLocation.DEFAULT_NAMESPACE, RootRegistry);
 
-        static Registries()
+        public static void InitExtBlockRegistries()
         {
             // can't register to an unregistered registry, so just directly set RegistryInfo for RootRegistry
             ResourceKey rootRegistryKey = ResourceKey.Create(ResourceKey.REGISTRY, ResourceKey.REGISTRY);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExtBlock.Core.State.StateProperties;
+
 using ExtBlock.Math;
 
 namespace ExtBlock.Core.State

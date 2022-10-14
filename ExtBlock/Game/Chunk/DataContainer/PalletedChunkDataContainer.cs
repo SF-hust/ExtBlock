@@ -6,6 +6,11 @@ namespace ExtBlock.Game.ChunkDataContainer
 {
     public class PalletedChunkDataContainer<T> : PalletedContainer<T>, IChunkDataContainer<T> where T : class
     {
+        public void CopyToArray(T[] array)
+        {
+            throw new NotImplementedException();
+        }
+
         public T Get(int x, int y, int z)
         {
             throw new NotImplementedException();

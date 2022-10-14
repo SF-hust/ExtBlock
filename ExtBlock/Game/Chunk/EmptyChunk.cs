@@ -8,6 +8,8 @@ namespace ExtBlock.Game
 
         public override bool Writable => false;
 
+        public override bool IsEmpty => true;
+
         public EmptyChunk(IWorld world, BlockState state, int x, int y, int z) : base(world, x, y, z)
         {
             _state = state;
@@ -25,6 +27,11 @@ namespace ExtBlock.Game
         public override BlockState GetBlockState(int x, int y, int z)
         {
             return _state;
+        }
+
+        public override void CopyToArray(BlockState[] array)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
