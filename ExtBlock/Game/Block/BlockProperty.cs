@@ -4,23 +4,36 @@ namespace ExtBlock.Game
 {
     public class BlockProperty : PropertyTable
     {
+        public readonly bool isAir;
         public readonly bool breakable;
         public readonly float baseBreakTime;
 
         public BlockProperty(Builder builder) : base(builder.custom, false)
         {
+            isAir = builder.isAir;
             breakable = builder.breakable;
             baseBreakTime = builder.baseBreakTime;
         }
 
         public sealed class Builder
         {
-            public Builder Create()
+            public static Builder Create()
             {
                 return new Builder();
             }
 
+            public BlockProperty Build()
+            {
+                return new BlockProperty(this);
+            }
+
             private Builder() { }
+
+            public Builder SetIsAir(bool isAir)
+            {
+                this.isAir = isAir;
+                return this;
+            }
 
             public Builder SetBreakable(bool breakable)
             {
@@ -46,6 +59,7 @@ namespace ExtBlock.Game
                 return this;
             }
 
+            public bool isAir = false;
             public bool breakable = true;
             public float baseBreakTime;
 

@@ -12,7 +12,7 @@ namespace ExtBlock.Core.Registry
 
         private static readonly DeferredRegister<Registry> deferredRegister = DeferredRegister<Registry>.Create(ResourceLocation.DEFAULT_NAMESPACE, RootRegistry);
 
-        public static void InitExtBlockRegistries()
+        public static void InitInternalRegistries()
         {
             // can't register to an unregistered registry, so just directly set RegistryInfo for RootRegistry
             ResourceKey rootRegistryKey = ResourceKey.Create(ResourceKey.REGISTRY, ResourceKey.REGISTRY);
@@ -22,6 +22,19 @@ namespace ExtBlock.Core.Registry
 
             // register other extblock registries
             Add("block", BlockRegistry);
+        }
+
+        public static void FireRootRegisterEvent()
+        {
+            RootRegistry.FireRegisterEvent();
+        }
+
+        public static void FireRegisterEvents()
+        {
+            foreach(var registry in RootRegistry.Entries)
+            {
+                registry.RegInfo.Entry.FireRegisterEvent();
+            }
         }
 
         /// <summary>

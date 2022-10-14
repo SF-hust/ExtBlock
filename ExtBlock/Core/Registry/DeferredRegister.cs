@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using ExtBlock.Resource;
+using ExtBlock.Utility.Logger;
 
 namespace ExtBlock.Core.Registry
 {
@@ -82,7 +83,14 @@ namespace ExtBlock.Core.Registry
         /// <param name="args">no use</param>
         private void DoRegister(object sender, Registry<ET>.RegisterEventArgs args)
         {
-            foreach(var pair in _entries)
+            LogUtil.Logger.Info($"DeferredRegister capture a register event:\n" +
+                $"modid = ({_modid}), registry = ({_registry.RegInfo.Location}),\n" +
+                "entries = {");
+            foreach (var pair in _entries)
+            {
+                LogUtil.Logger.Info(pair.Key.ToString());
+            }
+            foreach (var pair in _entries)
             {
                 ResourceLocation location = pair.Key;
                 ET entry = pair.Value;

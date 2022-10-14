@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using ExtBlock.Resource;
+using ExtBlock.Utility.Logger;
 
 namespace ExtBlock.Core.Registry
 {
@@ -15,8 +16,8 @@ namespace ExtBlock.Core.Registry
          */
 
         private RegistryInfo<Registry>? _regInfo;
-        RegistryInfo<Registry> IRegistryEntry<Registry>.RegInfo { get => _regInfo!; set => _regInfo = value; }
-        RegistryInfo IRegistryEntry.UntypedRegInfo => _regInfo!;
+        public RegistryInfo<Registry> RegInfo { get => _regInfo!; set => _regInfo = value; }
+        public RegistryInfo UntypedRegInfo => _regInfo!;
 
 
         /*
@@ -145,7 +146,7 @@ namespace ExtBlock.Core.Registry
             return -1;
         }
 
-        private bool _isLocked;
+        private bool _isLocked = false;
         /// <summary>
         /// indicates if this registry is locked, if true, this registry can't be modified
         /// </summary>
@@ -166,9 +167,11 @@ namespace ExtBlock.Core.Registry
             }
             int id = _entries.Count;
             _entries.Add(entry);
-            ResourceLocation registryLocation = ((IRegistryEntry<Registry>)this).RegInfo.Location;
+            ResourceLocation registryLocation = RegInfo.Location;
             RegistryInfo<ET> info = new RegistryInfo<ET>(id, ResourceKey.Create(registryLocation, location), this, entry);
             entry.RegInfo = info;
+            LogUtil.Logger.Info($"a new entry added to registry ({RegInfo.Location}) :\n" +
+                $"id = {id}, location = {location}");
             return true;
         }
 
