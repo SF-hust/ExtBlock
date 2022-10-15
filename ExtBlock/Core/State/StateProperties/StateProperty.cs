@@ -69,7 +69,7 @@ namespace ExtBlock.Core.State
             {
                 return true;
             }
-            return _name.Equals(other?.Name);
+            return _name == other?.Name;
         }
 
         public bool EqualWithValues(IStateProperty? other)

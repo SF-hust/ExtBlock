@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using ExtBlock.Core.State;
+
+using Newtonsoft.Json.Linq;
 
 namespace ExtBlock.Core.Property
 {
@@ -9,6 +10,17 @@ namespace ExtBlock.Core.Property
         protected Dictionary<IProperty, object> _properties = new Dictionary<IProperty, object>();
         public PropertyTable()
         {
+        }
+
+        public PropertyTable(JObject data)
+        {
+            foreach(KeyValuePair<string, JToken?> item in data)
+            {
+                if(item.Value != null)
+                {
+                    //_properties.Add()
+                }
+            }
         }
 
         public PropertyTable(PropertyTable table, bool copy = true)

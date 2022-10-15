@@ -61,7 +61,7 @@ namespace ExtBlock.Game
 
             public bool isAir = false;
             public bool breakable = true;
-            public float baseBreakTime;
+            public float baseBreakTime = 0.0f;
 
             public PropertyTable custom = new PropertyTable();
         }

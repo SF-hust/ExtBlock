@@ -5,7 +5,6 @@ using ExtBlock.Core.Registry;
 namespace ExtBlock.Game
 {
     public class Block : IRegistryEntry<Block>,
-        IBlockPropertyProvider,
         IStateDefiner<Block, BlockState>
     {
         // registry entry
