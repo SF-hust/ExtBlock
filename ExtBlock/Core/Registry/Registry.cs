@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 using ExtBlock.Resource;
 using ExtBlock.Utility.Logger;
 
@@ -40,7 +40,7 @@ namespace ExtBlock.Core.Registry
         /// <param name="id">entry id</param>
         /// <param name="entry">untyped entry instance</param>
         /// <returns>true if entry of id exists, or else false</returns>
-        public abstract bool TryGetUntypedEntryById(int id, out IRegistryEntry? entry);
+        public abstract bool TryGetUntypedEntryById(int id, [NotNullWhen(true)] out IRegistryEntry? entry);
 
         /// <summary>
         /// get untyped registrty entry by ResourceLocation
@@ -48,7 +48,7 @@ namespace ExtBlock.Core.Registry
         /// <param name="location">entry's (modid, name)</param>
         /// <param name="entry">untyped entry instance</param>
         /// <returns>true if entry of location exists, or else false</returns>
-        public abstract bool TryGetUntypedEntryByLocation(ResourceLocation location, out IRegistryEntry? entry);
+        public abstract bool TryGetUntypedEntryByLocation(ResourceLocation location, [NotNullWhen(true)] out IRegistryEntry? entry);
 
         /// <summary>
         /// get ResourceLocation by integer id
@@ -81,7 +81,7 @@ namespace ExtBlock.Core.Registry
 
         protected Dictionary<ResourceLocation, int> _idsByLocation = new Dictionary<ResourceLocation, int>();
 
-        public override bool TryGetUntypedEntryById(int id, out IRegistryEntry? entry)
+        public override bool TryGetUntypedEntryById(int id, [NotNullWhen(true)] out IRegistryEntry? entry)
         {
             if(id < _entries.Count)
             {
@@ -98,7 +98,7 @@ namespace ExtBlock.Core.Registry
         /// <param name="id">entry id</param>
         /// <param name="entry">entry instance</param>
         /// <returns>true if entry of id exists, or else false</returns>
-        public bool TryGetEntryById(int id, out IRegistryEntry<ET>? entry)
+        public bool TryGetEntryById(int id, [NotNullWhen(true)] out IRegistryEntry<ET>? entry)
         {
             if (id < _entries.Count)
             {
@@ -109,7 +109,7 @@ namespace ExtBlock.Core.Registry
             return false;
         }
 
-        public override bool TryGetUntypedEntryByLocation(ResourceLocation location, out IRegistryEntry? entry)
+        public override bool TryGetUntypedEntryByLocation(ResourceLocation location, [NotNullWhen(true)] out IRegistryEntry? entry)
         {
             if (_idsByLocation.TryGetValue(location, out int id))
             {
@@ -126,7 +126,7 @@ namespace ExtBlock.Core.Registry
         /// <param name="location">entry's (modid, name)</param>
         /// <param name="entry">typed entry instance</param>
         /// <returns>true if entry of location exists, or else false</returns>
-        public bool TryGetEntryByLocation(ResourceLocation location, out IRegistryEntry<ET>? entry)
+        public bool TryGetEntryByLocation(ResourceLocation location, [NotNullWhen(true)] out IRegistryEntry<ET>? entry)
         {
             if (_idsByLocation.TryGetValue(location, out int id))
             {
