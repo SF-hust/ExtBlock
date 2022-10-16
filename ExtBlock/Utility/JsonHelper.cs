@@ -1,61 +1,89 @@
 ﻿using System;
-
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace ExtBlock.Utility
 {
     public static class JsonHelper
     {
-        public static bool TryGetBool(JObject obj, string name, out bool value, bool acceptCast = false)
+        public static bool TryGetBool(JsonObject obj, string name, out bool value)
         {
-            if (obj.TryGetValue(name, out JToken? token))
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
             {
-                if (acceptCast)
-                {
-                    bool? v = (bool?)token;
-                    if(v != null)
-                    {
-                        value = v.Value;
-                        return true;
-                    }
-                }
-                else if (token.Type == JTokenType.Boolean)
-                {
-                    value = (bool)token;
-                    return true;
-                }
+                value = node.GetValue<bool>();
+                return true;
             }
-            value = false;
+            value = default;
             return false;
         }
 
-        public static bool GetBool(JObject obj, string name, bool acceptCast = false)
+        public static bool GetBool(JsonObject obj, string name)
         {
-            if (obj.TryGetValue(name, out JToken? token) && (acceptCast || token.Type == JTokenType.Boolean))
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
             {
-                return (bool)token;
+                return node.GetValue<bool>();
             }
-            throw new ArgumentException($"failed to get {name}(bool) from json");
+            throw new FormatException($"failed to get {name}(bool) from json");
         }
 
-        public static bool TryGetString(JObject obj, string name, out string value)
+        public static bool TryGetString(JsonObject obj, string name, out string value)
         {
-            if (obj.TryGetValue(name, out JToken? token) && token.Type == JTokenType.String)
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
             {
-                value = ((string?)token)!;
+                value = node.GetValue<string>();
                 return true;
             }
             value = string.Empty;
             return false;
         }
 
-        public static string GetString(JObject obj, string name)
+        public static string GetString(JsonObject obj, string name)
         {
-            if (obj.TryGetValue(name, out JToken? token) && token.Type == JTokenType.String)
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
             {
-                return ((string?)token)!;
+                return node.GetValue<string>();
             }
-            throw new ArgumentException($"failed to get {name}(bool) from json");
+            throw new FormatException($"failed to get {name}(string) from json");
         }
+
+        public static bool TryGetInt(JsonObject obj, string name, out int value)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
+            {
+                value = node.GetValue<int>();
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public static int GetInt(JsonObject obj, string name)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
+            {
+                return node.GetValue<int>();
+            }
+            throw new FormatException($"failed to get {name}(int) from json");
+        }
+
+        public static bool TryGetDouble(JsonObject obj, string name, out double value)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
+            {
+                value = node.GetValue<double>();
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public static double GetDouble(JsonObject obj, string name)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonValue)
+            {
+                return node.GetValue<double>();
+            }
+            throw new FormatException($"failed to get {name}(double) from json");
+        }
+
     }
 }
