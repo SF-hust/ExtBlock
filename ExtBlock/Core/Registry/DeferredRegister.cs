@@ -12,7 +12,7 @@ namespace ExtBlock.Core.Registry
     /// </summary>
     /// <example>
     /// <code>
-    /// DeferredRegister<Block> BlockRegister = DeferredRegister<Block>.Create("examplemod");
+    /// DeferredRegister<Block> BlockRegister = DeferredRegister<Block>.Create("example_mod");
     /// Block ExampleBlock = new Block();
     /// BlockRegister.Register("example_block", ExampleBlock);
     /// </code>
@@ -77,14 +77,14 @@ namespace ExtBlock.Core.Registry
         }
 
         /// <summary>
-        /// do actul register opration when _registry.OnRegisterEvent fired
+        /// do actul register operations when Registry<ET>.OnRegisterEvent fired
         /// </summary>
         /// <param name="sender">no use</param>
         /// <param name="args">no use</param>
         private void DoRegister(object sender, Registry<ET>.RegisterEventArgs args)
         {
             LogUtil.Logger.Info($"DeferredRegister capture a register event:\n" +
-                $"modid = ({_modid}), registry = ({_registry.RegInfo.Location}),\n" +
+                $"modid = ({_modid}), registry = ({_registry.RegEntryInfo.RegistryName}),\n" +
                 "entries = {");
             foreach (var pair in _entries)
             {

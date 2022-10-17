@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 
 namespace ExtBlock.Utility
@@ -22,7 +23,7 @@ namespace ExtBlock.Utility
             {
                 return node.GetValue<bool>();
             }
-            throw new FormatException($"failed to get {name}(bool) from json");
+            throw new InvalidOperationException($"failed to get {name}(bool) from json");
         }
 
         public static bool TryGetString(JsonObject obj, string name, out string value)
@@ -42,7 +43,7 @@ namespace ExtBlock.Utility
             {
                 return node.GetValue<string>();
             }
-            throw new FormatException($"failed to get {name}(string) from json");
+            throw new InvalidOperationException($"failed to get {name}(string) from json");
         }
 
         public static bool TryGetInt(JsonObject obj, string name, out int value)
@@ -62,7 +63,7 @@ namespace ExtBlock.Utility
             {
                 return node.GetValue<int>();
             }
-            throw new FormatException($"failed to get {name}(int) from json");
+            throw new InvalidOperationException($"failed to get {name}(int) from json");
         }
 
         public static bool TryGetDouble(JsonObject obj, string name, out double value)
@@ -82,7 +83,46 @@ namespace ExtBlock.Utility
             {
                 return node.GetValue<double>();
             }
-            throw new FormatException($"failed to get {name}(double) from json");
+            throw new InvalidOperationException($"failed to get {name}(double) from json");
+        }
+        public static bool TryGetArray(JsonObject obj, string name, [NotNullWhen(true)] out JsonArray? value)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonArray array)
+            {
+                value = array;
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
+        public static JsonArray GetArray(JsonObject obj, string name)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonArray array)
+            {
+                return array;
+            }
+            throw new InvalidOperationException($"failed to get {name}(array) from json");
+        }
+
+        public static bool TryGetObject(JsonObject obj, string name, [NotNullWhen(true)] out JsonObject? value)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonObject jsonObject)
+            {
+                value = jsonObject;
+                return true;
+            }
+            value = null;
+            return false;
+        }
+
+        public static JsonObject GetObject(JsonObject obj, string name)
+        {
+            if (obj.TryGetPropertyValue(name, out JsonNode? node) && node is JsonObject jsonObject)
+            {
+                return jsonObject;
+            }
+            throw new InvalidOperationException($"failed to get {name}(array) from json");
         }
 
     }

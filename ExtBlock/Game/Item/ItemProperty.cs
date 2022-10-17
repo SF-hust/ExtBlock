@@ -1,8 +1,8 @@
 ﻿using System;
-
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 using ExtBlock.Core.Property;
+using ExtBlock.Utility;
 
 namespace ExtBlock.Game
 {
@@ -24,28 +24,11 @@ namespace ExtBlock.Game
             Extra = new PropertyTable(builder.extra);
         }
 
-        public ItemProperty(JObject data)
+        public ItemProperty(JsonObject data)
         {
-            if (data.TryGetValue(KEY_STACKABLE, out JToken? node))
-            {
-                if (node.Type != JTokenType.Boolean)
-                {
-                    throw new ArgumentException("stackable is not Boolean type");
-                }
-                stackable = (bool)node;
-            }
-            if (data.TryGetValue(KEY_BASE_STACK_SIZE, out node))
-            {
-                baseStackSize = (int)node;
-            }
-            if (data.TryGetValue(KEY_STACKABLE, out node))
-            {
-                if (node.Type != JTokenType.Object)
-                {
-                    throw new ArgumentException("extra is not JObject type");
-                }
-                Extra = new PropertyTable((JObject)node);
-            }
+            JsonHelper.TryGetBool(data, KEY_STACKABLE, out stackable);
+            JsonHelper.TryGetInt(data, KEY_BASE_STACK_SIZE, out baseStackSize);
+
         }
 
         public sealed class Builder

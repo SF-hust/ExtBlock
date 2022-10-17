@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace ExtBlock.Core.Property
 {
@@ -12,9 +11,9 @@ namespace ExtBlock.Core.Property
         {
         }
 
-        public PropertyTable(JObject data)
+        public PropertyTable(JsonObject json)
         {
-            foreach(KeyValuePair<string, JToken?> item in data)
+            foreach(KeyValuePair<string, JsonNode?> item in json)
             {
                 if(item.Value != null)
                 {

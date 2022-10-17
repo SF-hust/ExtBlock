@@ -16,9 +16,9 @@ namespace ExtBlock.Core.Registry
         {
             // can't register to an unregistered registry, so just directly set RegistryInfo for RootRegistry
             ResourceKey rootRegistryKey = ResourceKey.Create(ResourceKey.REGISTRY, ResourceKey.REGISTRY);
-            RegistryInfo<Registry> rootRegistryInfo = new RegistryInfo<Registry>(-1, rootRegistryKey, RootRegistry, RootRegistry);
+            RegistryEntryInfo<Registry> rootRegistryInfo = new RegistryEntryInfo<Registry>(-1, rootRegistryKey, RootRegistry, RootRegistry);
             IRegistryEntry<Registry> rootRegistry = RootRegistry;
-            rootRegistry.RegInfo = rootRegistryInfo;
+            rootRegistry.RegEntryInfo = rootRegistryInfo;
 
             // register other extblock registries
             Add("block", BlockRegistry);
@@ -33,7 +33,7 @@ namespace ExtBlock.Core.Registry
         {
             foreach(var registry in RootRegistry.Entries)
             {
-                registry.RegInfo.Entry.FireRegisterEvent();
+                registry.RegEntryInfo.Element.FireRegisterEvent();
             }
         }
 

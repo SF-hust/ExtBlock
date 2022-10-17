@@ -7,9 +7,9 @@ namespace ExtBlock.Core.Registry
     /// <summary>
     /// Untyped registry entry infomation
     /// </summary>
-    public abstract class RegistryInfo
+    public abstract class RegistryEntryInfo
     {
-        protected RegistryInfo(int id, ResourceKey key)
+        protected RegistryEntryInfo(int id, ResourceKey key)
         {
             _id = id;
             _key = key;
@@ -30,12 +30,12 @@ namespace ExtBlock.Core.Registry
         /// <summary>
         /// (modid, name) of this registry entry
         /// </summary>
-        public ResourceLocation Location => Key.Location;
+        public ResourceLocation RegistryName => Key.Location;
 
         /// <summary>
         /// name of this registry entry
         /// </summary>
-        public string Path => Key.Location.Path;
+        public string LocalName => Key.Location.Path;
 
         /// <summary>
         /// typeof the registry entry class
@@ -57,36 +57,36 @@ namespace ExtBlock.Core.Registry
     /// registry entry infomation created and saved by registry
     /// </summary>
     /// <typeparam name="ET">class of registry entry</typeparam>
-    public class RegistryInfo<ET> : RegistryInfo
+    public class RegistryEntryInfo<ET> : RegistryEntryInfo
         where ET : class, IRegistryEntry<ET>
     {
-        public RegistryInfo(int id, ResourceKey key, Registry<ET> registry, ET entry) : base(id, key)
+        public RegistryEntryInfo(int id, ResourceKey key, Registry<ET> registry, ET element) : base(id, key)
         {
             _reg = registry;
-            _entry = entry;
+            _element = element;
         }
 
         public override Type EntryType => typeof(ET);
 
         public override Registry UntypedReg => Reg;
 
-        public override IRegistryEntry UntypedEntry => Entry;
+        public override IRegistryEntry UntypedEntry => Element;
 
-        protected Registry<ET> _reg;
         /// <summary>
         /// typed registry instance
         /// </summary>
         public Registry<ET> Reg => _reg;
+        protected Registry<ET> _reg;
 
-        protected ET _entry;
         /// <summary>
         /// typed registry entry instance
         /// </summary>
-        public ET Entry => _entry;
+        public ET Element => _element;
+        protected ET _element;
 
         public override string ToString()
         {
-            return $"RegistryEntry (Type = {EntryType}, Registry = {((IRegistryEntry<Registry>)Reg).RegInfo.Location}, id = {Id}, Location = {Location})";
+            return $"RegistryEntry (Type = {EntryType}, Registry = {Reg.RegEntryInfo.RegistryName}, id = {Id}, Location = {RegistryName})";
         }
     }
 }

@@ -15,9 +15,9 @@ namespace ExtBlock.Core.Registry
          * as RegistryEntry 
          */
 
-        private RegistryInfo<Registry>? _regInfo;
-        public RegistryInfo<Registry> RegInfo { get => _regInfo!; set => _regInfo = value; }
-        public RegistryInfo UntypedRegInfo => _regInfo!;
+        private RegistryEntryInfo<Registry>? _regInfo;
+        public RegistryEntryInfo<Registry> RegEntryInfo { get => _regInfo!; set => _regInfo = value; }
+        public RegistryEntryInfo UntypedRegInfo => _regInfo!;
 
 
         /*
@@ -58,7 +58,7 @@ namespace ExtBlock.Core.Registry
         public abstract int GetIdByLocation(ResourceLocation location);
 
         /// <summary>
-        /// fire register event for registry entries of this registry
+        /// fire register event
         /// </summary>
         public abstract void FireRegisterEvent();
     }
@@ -167,10 +167,10 @@ namespace ExtBlock.Core.Registry
             }
             int id = _entries.Count;
             _entries.Add(entry);
-            ResourceLocation registryLocation = RegInfo.Location;
-            RegistryInfo<ET> info = new RegistryInfo<ET>(id, ResourceKey.Create(registryLocation, location), this, entry);
-            entry.RegInfo = info;
-            LogUtil.Logger.Info($"a new entry added to registry ({RegInfo.Location}) :\n" +
+            ResourceLocation registryLocation = RegEntryInfo.RegistryName;
+            RegistryEntryInfo<ET> info = new RegistryEntryInfo<ET>(id, ResourceKey.Create(registryLocation, location), this, entry);
+            entry.RegEntryInfo = info;
+            LogUtil.Logger.Info($"a new entry added to registry ({RegEntryInfo.RegistryName}) :\n" +
                 $"id = {id}, location = {location}");
             return true;
         }

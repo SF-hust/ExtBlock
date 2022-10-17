@@ -1,5 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace ExtBlock.Game
 {
@@ -23,7 +23,7 @@ namespace ExtBlock.Game
             set => _count = System.Math.Clamp(value, 0, MaxStackSize);
         }
 
-        public readonly JObject ExtraData = new JObject();
+        public readonly JsonObject ExtraData = new JsonObject();
 
         public int Increase(int count)
         {

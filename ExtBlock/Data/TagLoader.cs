@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ExtBlock.Data
 {
-    public class TagData
+    public class TagLoader
     {
     }
 }
