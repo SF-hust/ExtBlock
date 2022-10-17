@@ -8,9 +8,9 @@ namespace ExtBlock.Game
         IStateDefiner<Block, BlockState>
     {
         // registry entry
-        private RegistryInfo<Block>? _regInfo;
-        public RegistryInfo<Block> RegInfo { get => _regInfo!; set => _regInfo ??= value; }
-        public RegistryInfo UntypedRegInfo => _regInfo!;
+        private RegistryEntryInfo<Block>? _regInfo;
+        public RegistryEntryInfo<Block> RegEntryInfo { get => _regInfo!; set => _regInfo ??= value; }
+        public RegistryEntryInfo UntypedRegInfo => _regInfo!;
 
         // state definition
         private StateDefinition<Block, BlockState>? _stateDefinition;

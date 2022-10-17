@@ -10,7 +10,7 @@ namespace ExtBlock.Core.Registry
         /// <summary>
         /// registry entry infomation as Untyped
         /// </summary>
-        public RegistryInfo UntypedRegInfo { get; }
+        public RegistryEntryInfo UntypedRegInfo { get; }
     }
 
     /// <summary>
@@ -33,6 +33,6 @@ namespace ExtBlock.Core.Registry
         /// <summary>
         /// typed registry entry infomation
         /// </summary>
-        public RegistryInfo<ET> RegInfo { get; set; }
+        public RegistryEntryInfo<ET> RegEntryInfo { get; set; }
     }
 }
