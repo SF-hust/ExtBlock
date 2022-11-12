@@ -7,35 +7,28 @@ using ExtBlock.Utility.Logger;
 namespace ExtBlock.Core.Registry
 {
     /// <summary>
-    /// a register helper class, you can add entries to a DeferredRegister<>,
-    /// and it will do actul register operations in proper time.
+    /// 用于管理游戏对象注册, 会执行真正的注册动作
     /// </summary>
-    /// <example>
-    /// <code>
-    /// DeferredRegister<Block> BlockRegister = DeferredRegister<Block>.Create("example_mod");
-    /// Block ExampleBlock = new Block();
-    /// BlockRegister.Register("example_block", ExampleBlock);
-    /// </code>
-    /// </example>
-    /// <typeparam name="ET">class of registry entry</typeparam>
-    public class DeferredRegister<ET>
-        where ET : class, IRegistryEntry<ET>
+    /// <typeparam name="T">class of registry entry</typeparam>
+    public class DeferredRegister<T>
+        where T : class, IRegistryEntry<T>
     {
         /// <summary>
-        /// create a DeferredRegister with your modid
+        /// 创建一个指定 modid 的 DeferredRegister, 后续使用 Register() 注册时会默认使用这个 modid,
+        /// 如果想向其中注册一个使用其他 modid 的 Entry, 使用 RegisterCustom()
         /// </summary>
         /// <param name="modid">your modid</param>
         /// <returns></returns>
-        public static DeferredRegister<ET> Create(string modid, Registry<ET> registry)
+        public static DeferredRegister<T> Create(Registry<T> registry, string modid)
         {
-            return new DeferredRegister<ET>(modid, registry);
+            return new DeferredRegister<T>(modid, registry);
         }
 
         private readonly string _modid;
-        private readonly Registry<ET> _registry;
-        private readonly Dictionary<ResourceLocation, ET> _entries = new Dictionary<ResourceLocation, ET>();
+        private readonly Registry<T> _registry;
+        private readonly Dictionary<ResourceLocation, T> _entries = new Dictionary<ResourceLocation, T>();
 
-        private DeferredRegister(string modid, Registry<ET> registry)
+        private DeferredRegister(string modid, Registry<T> registry)
         {
             _modid = modid;
             _registry = registry;
@@ -43,11 +36,11 @@ namespace ExtBlock.Core.Registry
         }
 
         /// <summary>
-        /// add registry entries for register later
+        /// 向 DeferredRegister 中添加一个新的 Entry
         /// </summary>
         /// <param name="name">name of registry entry</param>
         /// <param name="entry">entry to add</param>
-        public void Register(string name, ET entry)
+        public void Register(string name, T entry)
         {
             if(_entries.ContainsValue(entry))
             {
@@ -60,40 +53,42 @@ namespace ExtBlock.Core.Registry
         }
 
         /// <summary>
-        /// add registry entries in specific modid for register later, normally you should use Regiser() instead
+        /// 向 DeferredRegister 中添加一个新的 Entry, 但自行指定 modid
         /// </summary>
         /// <param name="location">(modid, name) of registry entry</param>
         /// <param name="entry">entry to add</param>
-        public void RegisterCustom(ResourceLocation location, ET entry)
+        public void RegisterCustom(string modid, string name, T entry)
         {
             if (_entries.ContainsValue(entry))
             {
                 throw new InvalidOperationException("can't add same entry to DeferredRegister");
             }
-            if (!_entries.TryAdd(location, entry))
+            if (!_entries.TryAdd(ResourceLocation.Create(modid, name), entry))
             {
                 throw new InvalidOperationException("can't add entries with same name to one DeferredRegister");
             }
         }
 
         /// <summary>
-        /// do actul register operations when Registry<ET>.OnRegisterEvent fired
+        /// 执行注册操作, 当 Registry<ET>.OnRegisterEvent 事件触发时被调用
         /// </summary>
         /// <param name="sender">no use</param>
         /// <param name="args">no use</param>
-        private void DoRegister(object sender, Registry<ET>.RegisterEventArgs args)
+        private void DoRegister(object sender, Registry<T>.RegisterEventArgs args)
         {
             LogUtil.Logger.Info($"DeferredRegister capture a register event:\n" +
-                $"modid = ({_modid}), registry = ({_registry.RegEntryInfo.RegistryName}),\n" +
+                $"modid = ({_modid}), registry = ({_registry.RegEntryInfo.Id}),\n" +
                 "entries = {");
             foreach (var pair in _entries)
             {
                 LogUtil.Logger.Info(pair.Key.ToString());
             }
+            LogUtil.Logger.Info("}");
+
             foreach (var pair in _entries)
             {
                 ResourceLocation location = pair.Key;
-                ET entry = pair.Value;
+                T entry = pair.Value;
                 _registry.Add(entry, location);
             }
         }

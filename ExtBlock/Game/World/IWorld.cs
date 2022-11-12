@@ -1,8 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 
 using ExtBlock.Math;
+using ExtBlock.Game.Block;
 
-namespace ExtBlock.Game
+namespace ExtBlock.Game.World
 {
     public interface IWorld : IBlockGetter
     {

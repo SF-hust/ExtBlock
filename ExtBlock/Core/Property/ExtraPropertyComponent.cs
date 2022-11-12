@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Nodes;
+using ExtBlock.Core.Component;
+using Newtonsoft.Json.Linq;
 
 namespace ExtBlock.Core.Property
 {
-    public class PropertyTable
+    public class ExtraPropertyComponent : GenericComponent
     {
         protected Dictionary<IProperty, object> _properties = new Dictionary<IProperty, object>();
-        public PropertyTable()
+        public ExtraPropertyComponent()
         {
         }
 
-        public PropertyTable(JsonObject json)
+        public ExtraPropertyComponent(JObject json)
         {
-            foreach(KeyValuePair<string, JsonNode?> item in json)
+            foreach(KeyValuePair<string, JToken?> item in json)
             {
                 if(item.Value != null)
                 {
@@ -22,15 +23,15 @@ namespace ExtBlock.Core.Property
             }
         }
 
-        public PropertyTable(PropertyTable table, bool copy = true)
+        public ExtraPropertyComponent(ExtraPropertyComponent other, bool copy = true)
         {
             if(copy)
             {
-                _properties = new Dictionary<IProperty, object>(table._properties);
+                _properties = new Dictionary<IProperty, object>(other._properties);
             }
             else
             {
-                _properties = table._properties;
+                _properties = other._properties;
             }
         }
 

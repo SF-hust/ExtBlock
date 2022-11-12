@@ -3,8 +3,16 @@ using System.Collections.Generic;
 
 namespace ExtBlock.Core.State
 {
+    /// <summary>
+    /// BooleanStateProperty: 只有两种状态 false/true
+    /// </summary>
     public sealed class BooleanStateProperty : StateProperty<bool>
     {
+        /// <summary>
+        /// 创建一个指定 name 的 BooleanStateProperty
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static BooleanStateProperty Create(string name)
         {
             return new BooleanStateProperty(name);
@@ -31,7 +39,7 @@ namespace ExtBlock.Core.State
             };
         }
 
-        public override int GetValueIndex(bool value)
+        public override int GetIndexByValue(bool value)
         {
             return value? 1 : 0;
         }

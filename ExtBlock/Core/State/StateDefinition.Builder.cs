@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
@@ -10,42 +10,47 @@ namespace ExtBlock.Core.State
         where O : class, IStateDefiner<O, S>
         where S : StateHolder<O, S>
     {
-        /// <summary>
-        /// 
-        /// </summary>
+        public static StateDefinition<O, S> BuildSingle(O owner, StateHolder<O, S>.Factory factory)
+        {
+            List<S> states;
+            states = new List<S>(1);
+            S state = factory(owner, null);
+            states.Add(state);
+            return new StateDefinition<O, S>(owner, states.ToImmutableArray(), state);
+        }
+
         public class Builder
         {
-            public delegate S StateFactory(O owner, StatePropertyList? properties);
 
             private readonly O _owner;
-            private readonly MutableStatePropertyList _propertyList = new MutableStatePropertyList();
-            private readonly StateFactory _factory;
+            private readonly StatePropertyList _propertyList = new StatePropertyList();
+            private readonly StateHolder<O, S>.Factory _factory;
 
-            protected Builder(O owner, StateFactory factory)
+            protected Builder(O owner, StateHolder<O, S>.Factory factory)
             {
                 _owner = owner;
                 _factory = factory;
             }
 
             /// <summary>
-            /// create a StateDefinition.Builder instance for owner
+            /// 创建 Builder
             /// </summary>
             /// <param name="owner">states' owner</param>
             /// <param name="factory">a delegate to create state with a owner and StateProperty-value list</param>
             /// <returns></returns>
-            public static Builder Create(O owner, StateFactory factory)
+            public static Builder Create(O owner, StateHolder<O, S>.Factory factory)
             {
                 return new Builder(owner, factory);
             }
 
             /// <summary>
-            /// add a StateProperty and the default value's index, this method is more efficient and generic
+            /// 添加一个 Property 及其在默认状态中的取值的下标, 推荐使用此版本而非其泛型版本
             /// </summary>
             /// <param name="property"></param>
             /// <param name="defaultValueIndex"></param>
             /// <returns></returns>
             /// <exception cref="Exception"></exception>
-            public Builder AddPropertyAndIndex(IStateProperty property, int defaultValueIndex)
+            public Builder AddPropertyAndIndex(StateProperty property, int defaultValueIndex)
             {
                 if (!property.IndexIsValid(defaultValueIndex))
                 {
@@ -61,7 +66,7 @@ namespace ExtBlock.Core.State
             }
 
             /// <summary>
-            /// add a StateProperty and the default value, this method is more visual
+            /// 添加一个 Property 及其在默认状态中的取值
             /// </summary>
             /// <typeparam name="VT"></typeparam>
             /// <param name="property"></param>
@@ -70,7 +75,7 @@ namespace ExtBlock.Core.State
             /// <exception cref="Exception"></exception>
             public Builder AddPropertyAndValue<VT> (StateProperty<VT> property, VT defaultValue)
             {
-                int index = property.GetValueIndex(defaultValue);
+                int index = property.GetIndexByValue(defaultValue);
                 if (index == -1)
                 {
                     throw new Exception($"In state definition for [{_owner}] :" +
@@ -85,7 +90,7 @@ namespace ExtBlock.Core.State
             }
 
             /// <summary>
-            /// build all possible states from added StateProperties, if no property is added before, just one state will be created
+            /// 根据各属性的组合构建所有的 State, 并设置好相应的 neighbour 和 follower, 如果没有任何属性则只会构建一个 State
             /// </summary>
             /// <returns></returns>
             public virtual StateDefinition<O, S> Build()
@@ -94,11 +99,11 @@ namespace ExtBlock.Core.State
                 int defaultStateIndex = 0;
                 List<int> indexOffsetForProperty = new List<int>(_propertyList.PropertyCount);
 
-                // calculate count of states and the index of the default state
-                // calculate index offset in states list for every property
+                // 计算 State 的数量, 默认 State 在列表中的下标,
+                // 以及每个属性顺序变化时对应的 State 在列表中下标的递增值
                 foreach (var pair in _propertyList)
                 {
-                    IStateProperty property = pair.Key;
+                    StateProperty property = pair.Key;
                     int i = pair.Value;
                     Debug.Assert(i >= 0 && i < property.CountOfValues);
                     indexOffsetForProperty.Add(stateCount);
@@ -107,44 +112,44 @@ namespace ExtBlock.Core.State
                 }
 
                 List<S> states;
-                // if this owner has no StateProperty defined
-                if (stateCount < 1)
+                // 如果只有一个状态
+                if (stateCount == 1)
                 {
                     states = new List<S>(1);
                     S state = _factory(_owner, null);
                     states.Add(state);
-                    return new StateDefinition<O, S>(_owner, states.AsReadOnly(), state);
+                    return new StateDefinition<O, S>(_owner, states.ToImmutableArray(), state);
                 }
 
-                // gen all states
+                // 创建所有的可能状态
                 states = new List<S>(stateCount);
-                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_propertyList.PropertyDefinition);
+                StatePropertyGenerator propertyGenerator = new StatePropertyGenerator(_propertyList.Properties);
                 for(int i = 0; i < stateCount; ++i)
                 {
                     S state = _factory(_owner, propertyGenerator.Next.AsImmutable);
                     states.Add(state);
                 }
 
-                List<Dictionary<IStateProperty, ReadOnlyCollection<S>>> neighboursForStates = new List<Dictionary<IStateProperty, ReadOnlyCollection<S>>>(stateCount);
-                // gen neighbours and followers for every state
+                List<Dictionary<StateProperty, ImmutableArray<S>>> neighboursForStates = new List<Dictionary<StateProperty, ImmutableArray<S>>>(stateCount);
+                // 为每个 State 创建对应的 neighbours 和 followers
                 for(int i = 0; i < stateCount; ++i)
                 {
                     S state = states[i];
 
-                    // gen neighbours
-                    Dictionary<IStateProperty, ReadOnlyCollection<S>> neighbour = new Dictionary<IStateProperty, ReadOnlyCollection<S>>();
+                    // 创建 neighbours
+                    Dictionary<StateProperty, ImmutableArray<S>> neighbour = new Dictionary<StateProperty, ImmutableArray<S>>();
                     for(int pi = 0; pi < _propertyList.PropertyCount; ++pi)
                     {
-                        IStateProperty property = _propertyList[pi].Key;
-                        ReadOnlyCollection<S> neighbourForThisProperty;
+                        StateProperty property = _propertyList[pi].Key;
+                        ImmutableArray<S> neighbourForProperty;
 
-                        // optimise: if neighbour list for current property exists, don't create again
+                        // 如果已经创建过所需的 neighbour 列表了, 直接引用它, 而不是再创建一遍
                         if(i % (indexOffsetForProperty[pi] * property.CountOfValues) > indexOffsetForProperty[pi])
                         {
                             int index = i - indexOffsetForProperty[pi];
-                            neighbourForThisProperty = neighboursForStates[index][property];
+                            neighbourForProperty = neighboursForStates[index][property];
                         }
-                        // create neighbour list for current property
+                        // 为一个 property 创建对应的 neighbour 列表
                         else
                         {
                             List<S> neighbourList = new List<S>(property.CountOfValues);
@@ -152,50 +157,51 @@ namespace ExtBlock.Core.State
                             {
                                 neighbourList.Add(states[i + j * indexOffsetForProperty[pi]]);
                             }
-                            neighbourForThisProperty = neighbourList.AsReadOnly();
+                            neighbourForProperty = neighbourList.ToImmutableArray();
                         }
-                        neighbour.Add(property, neighbourForThisProperty);
+                        neighbour.Add(property, neighbourForProperty);
                     }
 
-                    // gen followers
-                    Dictionary<IStateProperty, S> follower = new Dictionary<IStateProperty, S>();
+                    // 创建 followers
+                    Dictionary<StateProperty, S> follower = new Dictionary<StateProperty, S>();
                     for (int pi = 0; pi < _propertyList.PropertyCount; ++pi)
                     {
-                        IStateProperty property = _propertyList[pi].Key;
+                        StateProperty property = _propertyList[pi].Key;
                         int followStateIndex = (i + indexOffsetForProperty[pi]) % (property.CountOfValues * indexOffsetForProperty[pi]);
                         follower.Add(property, states[followStateIndex]);
                     }
 
-                    // set neighbours and followers
-                    state.SetNeighboursAndFollowers(
-                        new ReadOnlyDictionary<IStateProperty, ReadOnlyCollection<S>>(neighbour),
-                        new ReadOnlyDictionary<IStateProperty, S>(follower));
+                    // 设置 neighbours 和 followers
+                    state.SetNeighboursAndFollowers(neighbour.ToImmutableDictionary(), follower.ToImmutableDictionary());
                 }
 
-                // set default state
+                // 获取默认状态
                 S defaultState = states[defaultStateIndex];
-                return new StateDefinition<O, S>(_owner, states.AsReadOnly(), defaultState);
+                return new StateDefinition<O, S>(_owner, states.ToImmutableArray(), defaultState);
             }
 
+            /// <summary>
+            /// 用于遍历各个 StateProperty 的不同取值所能组合成的所有 State
+            /// </summary>
             private class StatePropertyGenerator
             {
-                private readonly List<IStateProperty> _properties;
+                private readonly List<StateProperty> _properties;
                 private readonly List<int> valueIndexes;
 
-                public StatePropertyGenerator(List<IStateProperty> properties)
+                public StatePropertyGenerator(List<StateProperty> properties)
                 {
                     _properties = properties;
                     valueIndexes = Enumerable.Repeat(0, properties.Count).ToList();
                 }
 
-                public MutableStatePropertyList Next
+                public StatePropertyList Next
                 {
                     get
                     {
-                        MutableStatePropertyList stateProperties = new MutableStatePropertyList();
+                        StatePropertyList stateProperties = new StatePropertyList();
                         for(int n = 0; n < _properties.Count; ++n)
                         {
-                            IStateProperty property = _properties[n];
+                            StateProperty property = _properties[n];
                             bool success = stateProperties.TryAdd(property, valueIndexes[n]);
                             Debug.Assert(success);
                         }

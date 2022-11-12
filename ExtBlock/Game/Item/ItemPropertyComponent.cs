@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Text.Json.Nodes;
-
+using ExtBlock.Core.Component;
 using ExtBlock.Core.Property;
 using ExtBlock.Utility;
 
 namespace ExtBlock.Game
 {
-    public class ItemProperty
+    public class ItemPropertyComponent : Component
     {
         public const string KEY_EXTRA = "extra";
 
@@ -16,19 +15,14 @@ namespace ExtBlock.Game
         public readonly bool stackable = true;
         public readonly int baseStackSize = 64;
 
-        public readonly PropertyTable Extra = new PropertyTable();
-        public ItemProperty(Builder builder)
+        public ItemPropertyComponent(Builder builder)
         {
             stackable = builder.stackable;
             baseStackSize = builder.baseStackSize;
-            Extra = new PropertyTable(builder.extra);
         }
 
-        public ItemProperty(JsonObject data)
+        public ItemPropertyComponent()
         {
-            JsonHelper.TryGetBool(data, KEY_STACKABLE, out stackable);
-            JsonHelper.TryGetInt(data, KEY_BASE_STACK_SIZE, out baseStackSize);
-
         }
 
         public sealed class Builder
@@ -38,9 +32,9 @@ namespace ExtBlock.Game
                 return new Builder();
             }
 
-            public ItemProperty Build()
+            public ItemPropertyComponent Build()
             {
-                return new ItemProperty(this);
+                return new ItemPropertyComponent(this);
             }
 
             private Builder() { }
@@ -55,22 +49,8 @@ namespace ExtBlock.Game
                 baseStackSize = size;
             }
 
-            /// <summary>
-            /// set a custom property's value
-            /// </summary>
-            /// <param name="property"></param>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            public Builder SetExtra(IProperty property, object value)
-            {
-                extra.Set(property, value);
-                return this;
-            }
-
             public bool stackable = true;
             public int baseStackSize = 64;
-
-            public PropertyTable extra = new PropertyTable();
         }
     }
 }

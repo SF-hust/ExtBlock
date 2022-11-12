@@ -1,92 +1,139 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+
 using ExtBlock.Resource;
+using ExtBlock.Core.Tag;
 
 namespace ExtBlock.Core.Registry
 {
     /// <summary>
-    /// Untyped registry entry infomation
+    /// 无类型的 RegistryEntry 注册信息
     /// </summary>
     public abstract class RegistryEntryInfo
     {
-        protected RegistryEntryInfo(int id, ResourceKey key)
+        protected RegistryEntryInfo(int numId, ResourceKey regKey)
         {
-            _id = id;
-            _key = key;
+            _numId = numId;
+            _regKey = regKey;
         }
 
-        protected int _id;
+        protected int _numId;
         /// <summary>
-        /// an integer id, for fast access
+        /// 此 Entry 在 Registry 中的数字Id, 在同一个 Registry 中唯一
         /// </summary>
-        public int Id => _id;
+        public int NumId => _numId;
 
-        protected ResourceKey _key;
+        protected ResourceKey _regKey;
         /// <summary>
-        /// (registry modid, registry name, modid, name) of this registry entry
+        /// 此 Entry 的 ResourceKey, 在整个游戏中唯一
         /// </summary>
-        public ResourceKey Key => _key;
-
-        /// <summary>
-        /// (modid, name) of this registry entry
-        /// </summary>
-        public ResourceLocation RegistryName => Key.Location;
+        public ResourceKey RegKey => _regKey;
 
         /// <summary>
-        /// name of this registry entry
+        /// 此 Entry 的字符串 Id, 即 "namespace:name", 在同一个 Registry 中唯一
         /// </summary>
-        public string LocalName => Key.Location.Path;
+        public ResourceLocation Id => RegKey.location;
 
         /// <summary>
-        /// typeof the registry entry class
+        /// 此 Entry 的 modid
+        /// </summary>
+        public string ModId => Id.namspace;
+
+        /// <summary>
+        /// 此 Entry 的名字, 在本模组命名空间下, 同一个 Registry 中唯一
+        /// </summary>
+        public string Name => RegKey.location.path;
+
+        /// <summary>
+        /// 此 Entry 的具体类型
         /// </summary>
         public abstract Type EntryType { get; }
 
         /// <summary>
-        /// registry instance as untyped
+        /// 此 Entry 被注册到的 Registry 实例, 其中的 Entry 类型未知
         /// </summary>
-        public abstract Registry UntypedReg { get; }
+        public abstract Registry UntypedRegistry { get; }
 
         /// <summary>
-        /// registry entry instance as IRegistryEntry
+        /// 实际 RegistryEntry 的引用, 没有具体类型信息
         /// </summary>
-        public abstract IRegistryEntry UntypedEntry { get; }
+        public abstract IRegistryEntry UntypedRegistryEntry { get; }
+
+        /// <summary>
+        /// RegistryEntryInfo 的 hashcode 被定义为其 ResourceKey 的 hashcode
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return _regKey.GetHashCode();
+        }
+
+        /// <summary>
+        /// RegistryEntryInfo 不会出现两个不同实例的值相同的情况
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj);
+        }
     }
 
     /// <summary>
-    /// registry entry infomation created and saved by registry
+    /// 已被注册到 Registry 中的 Entry 的信息,
+    /// 当 RegistryEntry 被添加到 Registry 中时, 会创建对应的此类示例
     /// </summary>
-    /// <typeparam name="ET">class of registry entry</typeparam>
-    public class RegistryEntryInfo<ET> : RegistryEntryInfo
-        where ET : class, IRegistryEntry<ET>
+    /// <typeparam name="T"> RegistryEntry 的具体类型 </typeparam>
+    public class RegistryEntryInfo<T> : RegistryEntryInfo
+        where T : class, IRegistryEntry<T>
     {
-        public RegistryEntryInfo(int id, ResourceKey key, Registry<ET> registry, ET element) : base(id, key)
+        public RegistryEntryInfo(int id, ResourceKey key, Registry<T> registry, T entry) : base(id, key)
         {
-            _reg = registry;
-            _element = element;
+            _registry = registry;
+            _entry = entry;
         }
 
-        public override Type EntryType => typeof(ET);
+        public override Type EntryType => typeof(T);
 
-        public override Registry UntypedReg => Reg;
+        public override Registry UntypedRegistry => Registry;
 
-        public override IRegistryEntry UntypedEntry => Element;
-
-        /// <summary>
-        /// typed registry instance
-        /// </summary>
-        public Registry<ET> Reg => _reg;
-        protected Registry<ET> _reg;
+        public override IRegistryEntry UntypedRegistryEntry => Entry;
 
         /// <summary>
-        /// typed registry entry instance
+        /// 此 Entry 被注册到的 Registry
         /// </summary>
-        public ET Element => _element;
-        protected ET _element;
+        public Registry<T> Registry => _registry;
+        protected Registry<T> _registry;
+
+        /// <summary>
+        /// 实际 RegistryEntry 对象的引用
+        /// </summary>
+        public T Entry => _entry;
+        protected T _entry;
 
         public override string ToString()
         {
-            return $"RegistryEntry (Type = {EntryType}, Registry = {Reg.RegEntryInfo.RegistryName}, id = {Id}, Location = {RegistryName})";
+            return $"RegistryEntry (type = {EntryType}, registry id = {Registry.RegEntryInfo.Id}, num id = {NumId}, id = {Id})";
+        }
+
+        /*
+         * Tag 相关
+         */
+
+        /// <summary>
+        /// RegistryEntry 的所有 Tag
+        /// </summary>
+        public ImmutableHashSet<Tag<T>> Tags => _tags;
+        private ImmutableHashSet<Tag<T>> _tags = ImmutableHashSet<Tag<T>>.Empty;
+
+        /// <summary>
+        /// 重新设置本 Entry 的 Tag, 这会发生在数据包加载时
+        /// </summary>
+        /// <param name="tags"></param>
+        public void ResetTags(IEnumerable<Tag<T>> tags)
+        {
+            _tags = tags.ToImmutableHashSet();
         }
     }
 }

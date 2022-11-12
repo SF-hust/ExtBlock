@@ -5,7 +5,7 @@
     }
 
     /// <summary>
-    /// a StateDefiner is a State's Owner, for example, Block is a StateDefiner and BlockState is its StateHolder
+    /// 需要定义状态 (如 BlockState) 的类需要继承这个接口, 并实现对应接口, 示例见 Block 类
     /// </summary>
     /// <typeparam name="O"></typeparam>
     /// <typeparam name="S"></typeparam>
@@ -13,6 +13,6 @@
         where O : class, IStateDefiner<O, S>
         where S : StateHolder<O, S>
     {
-        public StateDefinition<O, S> StateDef { get; set; }
+        public StateDefinition<O, S> StateDefinition { get; set; }
     }
 }

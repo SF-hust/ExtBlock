@@ -1,7 +1,7 @@
 ﻿using ExtBlock.Core.State;
 using ExtBlock.Enums;
 
-namespace ExtBlock.Game
+namespace ExtBlock.Game.Block
 {
     public static class BlockStateProperties
     {

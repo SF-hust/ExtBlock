@@ -1,25 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using ExtBlock.Core.Component;
 using ExtBlock.Core.Registry;
 
 namespace ExtBlock.Game
 {
-    public class Item : IRegistryEntry<Item>
+    public class Item : IRegistryEntry<Item>,
+        IComponentHolder
     {
-        // registry entry
+        public Item()
+        {
+            _components = new ComponentHolder(this);
+        }
+
+        /*
+         * 作为 RegistryEntry
+         */
+
         private RegistryEntryInfo<Item>? _regInfo;
         public RegistryEntryInfo<Item> RegEntryInfo { get => _regInfo!; set => _regInfo ??= value; }
-        public RegistryEntryInfo UntypedRegInfo => _regInfo!;
+        public virtual Type AsEntryType => typeof(Item);
 
-        // property
-        private readonly ItemProperty _properties;
-        public ItemProperty Properties => _properties;
+        /*
+         * 作为 ComponentHolder
+         */
 
-        public Item(ItemProperty properties)
-        {
-            _properties = properties;
-        }
+        public ComponentHolder Components => _components;
+        private readonly ComponentHolder _components;
+
+        /*
+         * Item 的内置组件
+         */
+         
     }
 }

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExtBlock.Data
+namespace ExtBlock.Client.Input
 {
-    public class TagLoader
+    public interface IInputHandler
     {
     }
 }

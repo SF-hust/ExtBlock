@@ -1,33 +1,48 @@
-﻿using ExtBlock.Core.Property;
+﻿using ExtBlock.Core.Component;
 
-namespace ExtBlock.Game
+namespace ExtBlock.Game.Block
 {
-    public class BlockProperty : PropertyTable
+    /// <summary>
+    /// 方块的基础属性组件, 存储着所有方块共有的属性
+    /// </summary>
+    public class BlockPropertyComponent : Component
     {
         public readonly bool isAir;
         public readonly bool breakable;
         public readonly float baseBreakTime;
 
-        public BlockProperty(Builder builder) : base(builder.custom, false)
+        public BlockPropertyComponent(Builder builder)
         {
             isAir = builder.isAir;
             breakable = builder.breakable;
             baseBreakTime = builder.baseBreakTime;
         }
 
+        public BlockPropertyComponent(BlockPropertyComponent other)
+        {
+            isAir = other.isAir;
+            breakable = other.breakable;
+            baseBreakTime = other.baseBreakTime;
+        }
+
+        public override IComponent CloneWithoutOwner()
+        {
+            return new BlockPropertyComponent(this);
+        }
+
         public sealed class Builder
         {
+            private Builder() { }
+
             public static Builder Create()
             {
                 return new Builder();
             }
 
-            public BlockProperty Build()
+            public BlockPropertyComponent Build()
             {
-                return new BlockProperty(this);
+                return new BlockPropertyComponent(this);
             }
-
-            private Builder() { }
 
             public Builder SetIsAir(bool isAir)
             {
@@ -47,23 +62,9 @@ namespace ExtBlock.Game
                 return this;
             }
 
-            /// <summary>
-            /// set a custom property's value
-            /// </summary>
-            /// <param name="property"></param>
-            /// <param name="value"></param>
-            /// <returns></returns>
-            public Builder SetCustom(IProperty property, object value)
-            {
-                custom.Set(property, value);
-                return this;
-            }
-
             public bool isAir = false;
             public bool breakable = true;
             public float baseBreakTime = 0.0f;
-
-            public PropertyTable custom = new PropertyTable();
         }
     }
 }

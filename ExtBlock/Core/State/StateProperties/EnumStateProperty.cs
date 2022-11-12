@@ -6,9 +6,19 @@ using System.Linq;
 
 namespace ExtBlock.Core.State
 {
+    /// <summary>
+    /// EnumStateProperty<T>: 取值为枚举类型, T 是对应的枚举类型,
+    /// 注意在解析字符串与将值转为字符串时会使用全小写, 因此使用的枚举不可以存在相同的成员名(在忽略大小写的情况下)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class EnumStateProperty<T> : StateProperty<T>
         where T : struct, Enum
     {
+        /// <summary>
+        /// 创建一个指定名字的 EnumStateProperty, 取值范围为枚举的成员与顺序为枚举内成员的声明顺序
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static EnumStateProperty<T> Create(string name)
         {
             CheckEnumEntries();
@@ -25,6 +35,13 @@ namespace ExtBlock.Core.State
             return new EnumStateProperty<T>(name, values.ToArray());
         }
 
+        /// <summary>
+        /// 创建一个指定名字的 EnumStateProperty, 取值与顺序为 values 的声明顺序
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public static EnumStateProperty<T> Create(string name, IEnumerable<T> values)
         {
             CheckEnumEntries();
@@ -47,9 +64,13 @@ namespace ExtBlock.Core.State
             return new EnumStateProperty<T>(name, valueList.ToArray());
         }
 
+        /// <summary>
+        /// 检查枚举的成员是否符合要求
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         private static void CheckEnumEntries()
         {
-            if (EnumCheckCache.Enums.Contains(typeof(T)))
+            if (EnumCheckCache.Enums.ContainsKey(typeof(T)))
             {
                 return;
             }
@@ -67,7 +88,7 @@ namespace ExtBlock.Core.State
                 }
                 keys.Add(lower);
             }
-            EnumCheckCache.Enums.Add(typeof(T));
+            EnumCheckCache.Enums[typeof(T)] = null;
         }
 
         protected EnumStateProperty(string name, T[] values) : base(name, values.Length)
@@ -82,8 +103,9 @@ namespace ExtBlock.Core.State
             }
         }
 
-        protected T[] _values;
         public override IEnumerable<T> Values => _values;
+        protected T[] _values;
+
         protected string[] _keys;
 
         public override bool ValueIsValid(T value)
@@ -91,7 +113,7 @@ namespace ExtBlock.Core.State
             return _values.Contains(value);
         }
 
-        public override int GetValueIndex(T value)
+        public override int GetIndexByValue(T value)
         {
             for(int i = 0; i < _values.Length; ++i)
             {
@@ -128,7 +150,7 @@ namespace ExtBlock.Core.State
 
         public override string ValueToString(T value)
         {
-            int index = GetValueIndex(value);
+            int index = GetIndexByValue(value);
             return index == -1 ? $"[undefined value(= {value})]" : _keys[index];
         }
 
@@ -143,8 +165,11 @@ namespace ExtBlock.Core.State
         }
     }
 
-    class EnumCheckCache
+    /// <summary>
+    /// 已被检查过符合要求的 enum 类型
+    /// </summary>
+    internal static class EnumCheckCache
     {
-        public static ConcurrentBag<Type> Enums = new ConcurrentBag<Type>();
+        public static ConcurrentDictionary<Type, object?> Enums = new ConcurrentDictionary<Type, object?>();
     }
 }

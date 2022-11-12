@@ -1,39 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using ExtBlock.Utility;
+
 namespace ExtBlock.Resource
 {
     public sealed class ResourceKey : IComparable<ResourceKey>
     {
-        public const string ROOT_REGISTRY_PATH = "registry";
-
-        public static readonly ResourceLocation REGISTRY = ResourceLocation.Create(ROOT_REGISTRY_PATH);
-
+        /// <summary>
+        /// 存储所有 ResourceKey, 值相同的 ResourceKey 只会有一个
+        /// </summary>
         private static readonly Dictionary<string, ResourceKey> RESOURCE_KEYS = new Dictionary<string, ResourceKey>();
 
-        public readonly ResourceLocation Registry;
-        public readonly ResourceLocation Location;
+        public readonly ResourceLocation registry;
+        public readonly ResourceLocation location;
+
+        private readonly int _hashcodeCache;
 
         public static ResourceKey Create(ResourceLocation registry, ResourceLocation location)
         {
-            string key = registry.ToString() + ":" + location.ToString();
-            if (RESOURCE_KEYS.TryGetValue(key, out ResourceKey resourceKey))
+            string key = registry.ToString() + "/" + location.ToString();
+            ResourceKey resourceKey;
+            lock (RESOURCE_KEYS)
             {
-                return resourceKey;
+                if (!RESOURCE_KEYS.TryGetValue(key, out resourceKey))
+                {
+                    resourceKey = new ResourceKey(registry, location);
+                    RESOURCE_KEYS.TryAdd(key, resourceKey);
+                }
             }
-            resourceKey = new ResourceKey(registry, location);
-            RESOURCE_KEYS.Add(key, resourceKey);
             return resourceKey;
         }
 
         public static ResourceKey Create(ResourceKey registryKey, ResourceLocation location)
         {
-            return Create(registryKey.Location, location);
+            return Create(registryKey.location, location);
         }
 
         public static ResourceKey CreateRegistryKey(ResourceLocation location)
         {
-            return Create(REGISTRY, location);
+            return Create(Constants.REGISTRY_LOCATION, location);
         }
         
         public static ResourceKey CreateRegistryKey(string name)
@@ -43,38 +49,39 @@ namespace ExtBlock.Resource
 
         private ResourceKey(ResourceLocation registry, ResourceLocation location)
         {
-            Registry = registry;
-            Location = location;
+            this.registry = registry;
+            this.location = location;
+            _hashcodeCache = 31 * registry.GetHashCode() + location.GetHashCode();
         }
 
         public bool IsFor(ResourceKey registryKey)
         {
-            return Registry.Equals(registryKey.Location);
+            return registry.Equals(registryKey.location);
         }
 
         public int CompareTo(ResourceKey? other)
         {
-            int rns = Registry.CompareTo(other?.Registry);
+            int rns = registry.CompareTo(other?.registry);
             if (rns != 0)
             {
                 return rns;
             }
-            return Location.CompareTo(other?.Location);
+            return location.CompareTo(other?.location);
         }
 
-        public sealed override bool Equals(object? obj)
+        public override bool Equals(object? obj)
         {
-            return CompareTo(obj as ResourceKey) == 0;
+            return ReferenceEquals(this, obj);
         }
 
-        public sealed override int GetHashCode()
+        public override int GetHashCode()
         {
-            return 31 * Registry.GetHashCode() + Location.GetHashCode();
+            return _hashcodeCache;
         }
 
-        public sealed override string ToString()
+        public override string ToString()
         {
-            return Registry.ToString() + "/" + Location.ToString();
+            return registry.ToString() + "/" + location.ToString();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Text.Json.Nodes;
+
+using MongoDB.Bson;
 
 namespace ExtBlock.Game
 {
@@ -23,7 +24,7 @@ namespace ExtBlock.Game
             set => _count = System.Math.Clamp(value, 0, MaxStackSize);
         }
 
-        public readonly JsonObject ExtraData = new JsonObject();
+        public readonly BsonDocument ExtraData = new BsonDocument();
 
         public int Increase(int count)
         {

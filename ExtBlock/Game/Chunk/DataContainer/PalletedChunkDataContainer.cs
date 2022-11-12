@@ -4,7 +4,7 @@ using ExtBlock.Utility.Container;
 
 namespace ExtBlock.Game.ChunkDataContainer
 {
-    public class PalletedChunkDataContainer<T> : PalletedContainer<T>, IChunkDataContainer<T> where T : class
+    public class PalletedChunkDataContainer<T> : PalettedContainer<T>, IChunkDataContainer<T> where T : class
     {
         public void CopyToArray(T[] array)
         {

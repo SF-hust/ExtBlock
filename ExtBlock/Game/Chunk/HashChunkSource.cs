@@ -7,7 +7,7 @@ namespace ExtBlock.Game
 {
     public class HashChunkSource : IChunkSource
     {
-        Dictionary<ChunkPos, IChunk> _chunks = new Dictionary<ChunkPos, IChunk>();
+        private readonly Dictionary<ChunkPos, IChunk> _chunks = new Dictionary<ChunkPos, IChunk>();
 
         public bool Get(int x, int y, int z, [NotNullWhen(true)] out IChunk? chunk)
         {

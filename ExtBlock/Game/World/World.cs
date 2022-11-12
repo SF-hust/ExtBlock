@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using ExtBlock.Math;
+using ExtBlock.Game.Block;
 
-namespace ExtBlock.Game
+namespace ExtBlock.Game.World
 {
-    public class World : IWorld
+    public abstract class World : IWorld
     {
         protected IChunkSource _chunks = new HashChunkSource();
+
+        public readonly Guid guid;
 
         public bool HasBlockAt(int x, int y, int z)
         {
@@ -15,7 +19,7 @@ namespace ExtBlock.Game
             return _chunks.Exist(chunkPos);
         }
 
-        public bool TryGetBlockState(int x, int y, int z, out BlockState? state)
+        public bool TryGetBlockState(int x, int y, int z, [NotNullWhen(true)] out BlockState? state)
         {
             ChunkPos chunkPos = GetPosAt(x, y, z, out BlockPos inChunkPos);
             if (_chunks.Get(chunkPos, out IChunk? chunk))
@@ -27,7 +31,7 @@ namespace ExtBlock.Game
             return false;
         }
 
-        public IEnumerable<BlockState> GetBlockStateRange(int x1, int y1, int z1, int x2, int y2, int z2)
+        public IEnumerable<(BlockPos, BlockState)> GetBlockStateRange(int x1, int y1, int z1, int x2, int y2, int z2)
         {
             throw new System.NotImplementedException();
         }
@@ -61,6 +65,5 @@ namespace ExtBlock.Game
         {
             return GetPosAt(pos.x, pos.y, pos.z, out inChunkPos);
         }
-
     }
 }

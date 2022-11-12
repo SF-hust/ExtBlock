@@ -5,15 +5,17 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtBlock", "ExtBlock\ExtBlock.csproj", "{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtBlockClient", "ExtBlockClient\ExtBlockClient.csproj", "{CF512015-847F-4157-B640-42DAE843F4FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtBlockClient", "ExtBlockClient\ExtBlockClient.csproj", "{CF512015-847F-4157-B640-42DAE843F4FD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885} = {6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtBlockServer", "ExtBlockServer\ExtBlockServer.csproj", "{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtBlockServer", "ExtBlockServer\ExtBlockServer.csproj", "{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6395FD7B-CD20-46C8-AB75-BC4BB5DFB885} = {6395FD7B-CD20-46C8-AB75-BC4BB5DFB885}
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreMod", "CoreMod\CoreMod.csproj", "{6A9E859A-3FCB-4282-9697-8175EE0D2DEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CF6A9D1-FA5F-40D5-A96D-F8335E210FC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A9E859A-3FCB-4282-9697-8175EE0D2DEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A9E859A-3FCB-4282-9697-8175EE0D2DEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A9E859A-3FCB-4282-9697-8175EE0D2DEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A9E859A-3FCB-4282-9697-8175EE0D2DEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,4 +14,10 @@
     <ProjectReference Include="..\ExtBlock\ExtBlock.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Block\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
 </Project>

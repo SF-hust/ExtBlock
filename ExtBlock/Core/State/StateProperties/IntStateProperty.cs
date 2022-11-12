@@ -4,12 +4,28 @@ using System.Linq;
 
 namespace ExtBlock.Core.State
 {
+    /// <summary>
+    /// IntStateProperty: 可以取指定连续范围内的 int 值(可以是负值)
+    /// </summary>
     public class IntStateProperty : StateProperty<int>
     {
+        /// <summary>
+        /// 创建一个指定名字的 IntStateProperty, 取值范围 [from, to]
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         public static IntStateProperty Create(string name, int from, int to)
         {
             return new IntStateProperty(name, from, to);
         }
+
+        /// <summary>
+        /// 创建一个指定名字的 IntStateProperty, 取值范围 [0, 1]
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static IntStateProperty Create(string name)
         {
             return new IntStateProperty(name, 0, 1);
@@ -39,7 +55,7 @@ namespace ExtBlock.Core.State
             throw new IndexOutOfRangeException();
         }
 
-        public override int GetValueIndex(int value)
+        public override int GetIndexByValue(int value)
         {
             if(!ValueIsValid(value))
             {
@@ -55,6 +71,10 @@ namespace ExtBlock.Core.State
 
         public override string ValueToString(int value)
         {
+            if(!ValueIsValid(value))
+            {
+                return "!# " + value.ToString(); 
+            }
             return value.ToString();
         }
 
@@ -65,7 +85,7 @@ namespace ExtBlock.Core.State
 
         public override string ToString()
         {
-            return base.ToString() + $" , in [{_from}, {_to}]";
+            return base.ToString() + $" , values: [{_from}, {_to}]";
         }
     }
 }

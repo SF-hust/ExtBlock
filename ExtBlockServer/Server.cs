@@ -1,4 +1,4 @@
-﻿namespace ExtBlockServer
+﻿namespace ExtBlock.Server
 {
     public class Server
     {

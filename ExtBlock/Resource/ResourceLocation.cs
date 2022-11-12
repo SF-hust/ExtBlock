@@ -1,15 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Linq;
+using ExtBlock.Utility;
 
 namespace ExtBlock.Resource
 {
     public sealed class ResourceLocation : IComparable<ResourceLocation>
     {
-        public const string DEFAULT_NAMESPACE = "extblock";
-
-        public readonly string Namespace;
-        public readonly string Path;
+        public readonly string namspace;
+        public readonly string path;
 
         public static ResourceLocation Create(string namspace, string path)
         {
@@ -26,7 +25,7 @@ namespace ExtBlock.Resource
 
         public static ResourceLocation Create(string path)
         {
-            return Create(DEFAULT_NAMESPACE, path);
+            return Create(Constants.DEFAULT_NAMESPACE, path);
         }
 
         public static ResourceLocation? TryCreate(string namspace, string path)
@@ -96,8 +95,8 @@ namespace ExtBlock.Resource
 
         private ResourceLocation(string namspace, string path)
         {
-            Namespace = namspace;
-            Path = path;
+            this.namspace = namspace;
+            this.path = path;
         }
 
         public int CompareTo(ResourceLocation? other)
@@ -110,12 +109,12 @@ namespace ExtBlock.Resource
             {
                 return -1;
             }
-            int rns = Path.CompareTo(other?.Path);
+            int rns = path.CompareTo(other?.path);
             if (rns != 0)
             {
                 return rns;
             }
-            return Namespace.CompareTo(other?.Namespace);
+            return namspace.CompareTo(other?.namspace);
         }
 
         public int CompareNamespaced(ResourceLocation? other)
@@ -128,12 +127,12 @@ namespace ExtBlock.Resource
             {
                 return -1;
             }
-            int rns = Namespace.CompareTo(other?.Namespace);
+            int rns = namspace.CompareTo(other?.namspace);
             if (rns != 0)
             {
                 return rns;
             }
-            return Path.CompareTo(other?.Path);
+            return path.CompareTo(other?.path);
         }
 
         public override bool Equals(object? obj)
@@ -143,12 +142,12 @@ namespace ExtBlock.Resource
 
         public override int GetHashCode()
         {
-            return 31 * Namespace.GetHashCode() + Path.GetHashCode();
+            return 31 * namspace.GetHashCode() + path.GetHashCode();
         }
 
         public override string ToString()
         {
-            return Namespace + ":" + Path;
+            return namspace + ":" + path;
         }
     }
 }
